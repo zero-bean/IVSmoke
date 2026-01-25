@@ -1,0 +1,67 @@
+# ---------------------------------------------------------------------------
+# Visual Studio & IDE Files
+# ---------------------------------------------------------------------------
+.vs/
+.vscode/
+.idea/
+*.sln
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+.vsconfig
+
+# ---------------------------------------------------------------------------
+# OS Generated Files
+# ---------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ---------------------------------------------------------------------------
+# Unreal Engine Build & Intermediate Files
+# ---------------------------------------------------------------------------
+# Ignore Binaries and Intermediate folders in any depth
+**/Binaries/
+**/Intermediate/
+**/DerivedDataCache/
+**/Saved/
+**/Build/
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+*.pdb
+
+# Executables
+*.exe
+*.out
+*.app
+*.ipa
+
+# ---------------------------------------------------------------------------
+# Documentation (Doxygen)
+# ---------------------------------------------------------------------------
+# Ignore LaTeX output (Not needed for GitHub Pages)
+Docs/Doxygen/latex/
+# Ignore Doxygen warning/log files
+doxy.log
+doxygen_warnings.txt
+
+# Note: We explicitly keep 'Docs/Doxygen/html' for GitHub Pages.
