@@ -4,13 +4,38 @@
 
 #include "CoreMinimal.h"
 #include "Net/Serialization/FastArraySerializer.h"
-#include "IVSmokeHoleCarveCS.h"
+#include "IVSmokeHoleShaders.h"
 #include "IVSmokeHoleData.generated.h"
 
 struct FIVSmokeHoleArray;
 class UIVSmokeHoleGeneratorComponent;
 class UIVSmokeHolePreset;
+class UTexture2D;
 struct FIVSmokeHoleGPU;
+
+/**
+ * @struct FIVSmokeHoleNoiseSettings
+ * @brief Noise settings for hole shape distortion.
+ */
+USTRUCT()
+struct IVSMOKE_API FIVSmokeHoleNoiseSettings
+{
+	GENERATED_BODY()
+
+	/** Noise texture for shape distortion. */
+	UPROPERTY(EditAnywhere, Category = "Noise", meta = (Tooltip = "Noise texture for shape distortion."))
+	TObjectPtr<UTexture2D> Texture;
+
+	/** Noise strength. 0 = no noise, 1 = full effect. */
+	UPROPERTY(EditAnywhere, Category = "Noise", meta = (ClampMin = "0.0", ClampMax = "1.0",
+		Tooltip = "Noise strength. 0 = no noise, 1 = full effect."))
+	float Strength = 0.0f;
+
+	/** Noise UV scale. Higher = more detailed patterns. */
+	UPROPERTY(EditAnywhere, Category = "Noise", meta = (ClampMin = "0.1", ClampMax = "2.0",
+		Tooltip = "Noise UV scale. Higher = more detailed patterns."))
+	float Scale = 1.0f;
+};
 
 /**
  * @struct FIVSmokeHoleDynamicSubject
@@ -45,7 +70,7 @@ struct IVSMOKE_API FIVSmokeHoleDynamicSubject
  * @struct FIVSmokeHoleData
  * @brief Network-optimized hole data structure.
  */
-USTRUCT(BlueprintType)
+USTRUCT()
 struct IVSMOKE_API FIVSmokeHoleData : public FFastArraySerializerItem
 {
 	GENERATED_BODY()
@@ -144,6 +169,9 @@ public:
 	/** Reserve size items array */
 	FORCEINLINE void Reserve(const int32 Number) { Items.Reserve(Number); }
 
+	/** Empty items array and mark dirty. */
+	void Empty();
+
 	/** Converts items array into an array of GPU-compatible hole data structures. */
 	TArray<FIVSmokeHoleGPU> GetHoleGPUData(const float CurrentServerTime) const;
 };
@@ -158,83 +186,3 @@ struct TStructOpsTypeTraits<FIVSmokeHoleArray> : public TStructOpsTypeTraitsBase
 	};
 };
 
-/**
- * @struct FIVSmokeHoleGPU
- * @brief Built from FIVSmokeHoleData + UIVSmokeHolePreset at render time.
- */
-struct alignas(16) FIVSmokeHoleGPU
-{
-	FIVSmokeHoleGPU() = default;
-
-	/**
-	 * You can Constructs a FIVSmokeHoleGPU using DynamicHoleData, Preset, and server time.
-	 * @param DynamicHoleData		Dynamic hole data.
-	 * @param Preset				HolePreset defined as DataAsset. 
-	 * @param CurrentServerTime		The CurrentServerTime is obtained through the GetSyncedTime function.
-	 */
-	FIVSmokeHoleGPU(const FIVSmokeHoleData& DynamicHoleData, const UIVSmokeHolePreset& Preset, const float CurrentServerTime);
-
-	//~============================================================================
-	// Common
-
-	/** The central point of hole creation. */
-	FVector3f Position;
-
-	/** Time after hole is called creation. */
-	float CurLifeTime;
-
-	/** 0 = Penetration, 1 = Explosion, 2 = Dynamic */
-	int HoleType;
-
-	/** Radius value used to calculate values related to the range. */
-	float Radius;
-
-	/** Total duration. */
-	float Duration;
-
-	/** Edge smooth range. */
-	float Softness;
-
-	//~============================================================================
-	// Dynamic
-
-	/** the size of a hole. */
-	FVector3f Extent;
-
-	float DynamicPadding;
-
-	//~============================================================================
-	// Explosion
-
-	/** Expansion time used only for Explosion. */
-	float ExpansionDuration;
-
-	/** Current fadeRange extracted from ExpansionFadeRangeCurveOverTime with values normalized to expansion time. */
-	float CurExpansionFadeRangeOverTime;
-
-	/** Current fadeRange extracted from ShrinkFadeRangeCurveOverTime with values normalized to shrink time. */
-	float CurShrinkFadeRangeOverTime;
-
-	/** Current density extracted from ShrinkDensityMulCurveOverTime with values normalized to shrink time. */
-	float CurShrinkDensityMulOverTime;
-
-	/** Current distortion extracted from DistortionCurveOverTime with values normalized to expansion time. */
-	float CurDistortionOverTime;
-
-	/** Distortion degree max value. */
-	float DistortionDistance;
-
-	FVector2f PresetExplosionPadding;
-
-	/** These values sampled from DistanceCurveOverDistance. */
-	float DistortionCurveOverDistance[FIVSmokeHoleCarveCS::CurveSampleCount];
-
-	//~============================================================================
-	// Penetration
-
-	/** The point at which the trajectory of the penetration ends. */
-	FVector3f EndPosition;
-
-	/** Radius at the end position. */
-	float EndRadius;
-};

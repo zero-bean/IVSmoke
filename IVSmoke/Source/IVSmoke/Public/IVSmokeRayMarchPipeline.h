@@ -40,9 +40,9 @@ struct FIVSmokeOccupancyConfig
 	/** Maximum supported volumes (128 = uint4 bitmask). */
 	static constexpr uint32 MaxVolumes = 128;
 
-	/** Thread group size for tile setup (8×8 threads per tile). */
-	static constexpr uint32 TileSetupThreadsX = 8;
-	static constexpr uint32 TileSetupThreadsY = 8;
+	/** Thread group size for tile setup (64×1 threads for parallel Bitonic Sort). */
+	static constexpr uint32 TileSetupThreadsX = 64;
+	static constexpr uint32 TileSetupThreadsY = 1;
 
 	/** Thread group size for occupancy build (8×8×4). */
 	static constexpr uint32 OccupancyBuildThreadsX = 8;
@@ -265,7 +265,8 @@ public:
 	BEGIN_SHADER_PARAMETER_STRUCT(FParameters, )
 		// Output (Dual Render Target)
 		SHADER_PARAMETER_RDG_TEXTURE_UAV(RWTexture2D<float4>, SmokeAlbedoTex)
-		SHADER_PARAMETER_RDG_TEXTURE_UAV(RWTexture2D<float4>, SmokeMaskTex)
+		SHADER_PARAMETER_RDG_TEXTURE_UAV(RWTexture2D<float4>, SmokeLocalPosAlphaTex)
+		SHADER_PARAMETER_RDG_TEXTURE_UAV(RWTexture2D<float4>, SmokeWorldPosDepthTex)
 
 		// Occupancy inputs
 		SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<FIVSmokeTileData>, TileDataBuffer)
@@ -314,6 +315,8 @@ public:
 		SHADER_PARAMETER_RDG_TEXTURE_SRV(Texture3D, PackedVoxelAtlas)
 		SHADER_PARAMETER_RDG_TEXTURE_SRV(Texture3D, PackedHoleAtlas)
 		SHADER_PARAMETER(FIntVector, VoxelTexSize)
+		SHADER_PARAMETER(FIntVector, PackedVoxelTexSize)
+		SHADER_PARAMETER(FIntVector, VoxelAtlasCount)
 		SHADER_PARAMETER(FIntVector, HoleTexSize)
 		SHADER_PARAMETER(FIntVector, PackedHoleTexSize)
 		SHADER_PARAMETER(FIntVector, HoleAtlasCount)
@@ -372,6 +375,7 @@ public:
 
 		// Temporal (for TAA integration)
 		SHADER_PARAMETER(uint32, FrameNumber)
+		SHADER_PARAMETER(float, JitterIntensity)
 	END_SHADER_PARAMETER_STRUCT()
 
 	static bool ShouldCompilePermutation(const FGlobalShaderPermutationParameters& Parameters)

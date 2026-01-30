@@ -94,20 +94,12 @@ public:
 	TObjectPtr<UCurveFloat> ShrinkFadeRangeCurveOverTime;
 
 	/**
-	 * Density multiply value curve over shrink time.
-	 * Use normalized time between 0 and 1
+	 * Distortion exp value over expansion time.
+	 * 1 - pow((1 - NormalizedTime), ExpValue)
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shrink", meta = (EditConditionHides, EditCondition = "HoleType == EIVSmokeHoleType::Explosion",
-		Tooltip = "Density multiply value curve over shrink time. Use normalized time between 0 and 1"))
-	TObjectPtr<UCurveFloat> ShrinkDensityMulCurveOverTime;
-
-	/**
-	 * Distortion degree curve over expansion time.
-	 * Use normalized time between 0 and 1
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Distortion", meta = (EditConditionHides, EditCondition = "HoleType == EIVSmokeHoleType::Explosion",
-		Tooltip = "Distortion degree curve over expansion time. Use normalized time between 0 and 1"))
-	TObjectPtr<UCurveFloat> DistortionCurveOverTime;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Distortion", meta = (ClampMin = "1.0", ClampMax = "5.0", EditConditionHides, EditCondition = "HoleType == EIVSmokeHoleType::Explosion",
+		Tooltip = "Distortion exp value over expansion time. 1 - pow((1 - NormalizedTime), ExpValue)"))
+	float DistortionExpOverTime = 1.0f;
 
 	/**
 	 * Distortion degree max value.
@@ -115,15 +107,7 @@ public:
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Distortion", meta = (ClampMin = "0.0", ClampMax = "1000.0", EditConditionHides, EditCondition = "HoleType == EIVSmokeHoleType::Explosion",
 		Tooltip = "Distortion degree max value."))
-	float DistortionDistance = 0.0f;
-
-	/**
-	 * Distortion degree curve over distance to explosion point.
-	 * Use normalized x axis(distance) between 0 and 1
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Distortion", meta = (EditConditionHides, EditCondition = "HoleType == EIVSmokeHoleType::Explosion",
-		Tooltip = "Distortion degree curve over distance to explosion point. Use normalized x axis(distance) between 0 and 1"))
-	TObjectPtr<UCurveFloat> DistortionCurveOverDistance;
+	float DistortionDistance = 250.0f;
 
 	//~============================================================================
 	// Penetration
@@ -131,9 +115,17 @@ public:
 	/**
 	 * EndRadius represents the radius at the EndPosition in a penetration hole.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IVSmoke", meta = (ClampMin = "0.0", ClampMax = "60.0", EditConditionHides, EditCondition = "HoleType == EIVSmokeHoleType::Penetration",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IVSmoke", meta = (ClampMin = "0.0", ClampMax = "1000.0", EditConditionHides, EditCondition = "HoleType == EIVSmokeHoleType::Penetration",
 		Tooltip = "EndRadius represents the radius at the EndPosition in a penetration hole."))
 	float EndRadius = 25.0f;
+
+	/**
+	 * Bullet thickness for obstacle collision detection.
+	 * Larger values make bullets more likely to be blocked by nearby walls.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IVSmoke", meta = (ClampMin = "0.1", ClampMax = "50.0", EditConditionHides, EditCondition = "HoleType == EIVSmokeHoleType::Penetration",
+		Tooltip = "Bullet thickness for obstacle detection. Larger values make bullets more likely to be blocked by nearby walls."))
+	float BulletThickness = 5.0f;
 
 	//~============================================================================
 	// Dynamic
@@ -162,15 +154,6 @@ public:
 	 * If not, return nullptr.
 	 */
 	static TObjectPtr<UIVSmokeHolePreset> FindByID(const uint8 InPresetID);
-
-	/**
-	 * Samples the value from 0 to 1 of the curve by SampleCount and store the OutCurveSamples.
-	 * if the curve is nullptr, early return
-	 * @param Curve				Curve to be sampled
-	 * @param SampleCount		SampleCount. It should match the array size of the OutCurveSamples.
-	 * @param OutCurveSamples	Sampled array.
-	 */
-	static void GetCurveSamples(const UCurveFloat* Curve, const int32 SampleCount, float* OutCurveSamples);
 
 	/**
 	 * Returns the y value corresponding to the x value of the curve.

@@ -8,43 +8,6 @@
 #include "IVSmokeSettings.generated.h"
 
 /**
- * Noise generation settings for volumetric smoke.
- */
-USTRUCT(BlueprintType)
-struct IVSMOKE_API FIVSmokeNoiseSettings
-{
-	GENERATED_BODY()
-
-	/** Random seed for noise generation. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "IVSmoke | Noise")
-	int32 Seed = 0;
-
-	/** Texture resolution (TexSize x TexSize x TexSize). */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "IVSmoke | Noise", meta = (ClampMin = "16", ClampMax = "512"))
-	int32 TexSize = 128;
-
-	/** Number of noise octaves for detail. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "IVSmoke | Noise", meta = (ClampMin = "1", ClampMax = "8"))
-	int32 Octaves = 6;
-
-	/** Noise wrap factor. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "IVSmoke | Noise", meta = (ClampMin = "0.0", ClampMax = "1.0"))
-	float Wrap = 0.76f;
-
-	/** Noise amplitude. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "IVSmoke | Noise", meta = (ClampMin = "0.0", ClampMax = "1.0"))
-	float Amplitude = 0.62f;
-
-	/** Number of cells per axis for Worley noise. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "IVSmoke | Noise", meta = (ClampMin = "1", ClampMax = "16"))
-	int32 AxisCellCount = 4;
-
-	/** Size of each cell. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "IVSmoke | Noise", meta = (ClampMin = "8", ClampMax = "128"))
-	int32 CellSize = 32;
-};
-
-/**
  * Post-processing pass where smoke is rendered.
  * Affects interaction with particles, DOF, Bloom, and other effects.
  */
@@ -60,33 +23,101 @@ enum class EIVSmokeRenderPass : uint8
 	/** Translucency After DOF. Smoke renders over AfterDOF particles. Experimental. */
 	TranslucencyAfterDOF UMETA(DisplayName = "Translucency After DOF (Experimental)"),
 
-	/** After Motion Blur. Most effects applied but may cause edge artifacts. */
-	MotionBlur UMETA(DisplayName = "After Motion Blur"),
+	/** After Motion Blur. Most effects applied but may cause edge artifacts.
+	 *  @deprecated Not recommended due to visual artifacts. */
+	MotionBlur UMETA(DisplayName = "After Motion Blur", Hidden),
 
-	/** After Tonemapping. All particles rendered below, but no Bloom/DOF/TAA on smoke. */
-	Tonemap UMETA(DisplayName = "After Tonemap (No Post Effects)")
+	/** After Tonemapping. All particles rendered below, but no Bloom/DOF/TAA on smoke.
+	 *  @deprecated Not recommended due to missing post-processing effects. */
+	Tonemap UMETA(DisplayName = "After Tonemap (No Post Effects)", Hidden)
 };
 
 /**
- * Quality level presets for volumetric smoke rendering.
- * Controls ray marching steps and minimum step size.
+ * Global quality preset that sets all section quality levels at once.
  */
 UENUM(BlueprintType)
-enum class EIVSmokeQualityLevel : uint8
+enum class EIVSmokeGlobalQuality : uint8
 {
-	/** Fast performance, lower quality. MaxSteps=128, MinStepSize=50 */
-	Low UMETA(DisplayName = "Low (Fast)"),
+	/** All sections set to Low (External Shadow Off). */
+	Low UMETA(DisplayName = "Low (Performance)"),
 
-	/** Balanced quality and performance. MaxSteps=256, MinStepSize=25 */
+	/** All sections set to Medium. */
 	Medium UMETA(DisplayName = "Medium (Balanced)"),
 
-	/** Best quality, higher cost. MaxSteps=512, MinStepSize=16 */
+	/** All sections set to High. */
 	High UMETA(DisplayName = "High (Quality)"),
 
-	/** User-defined MaxSteps and MinStepSize. */
+	/** Per-section custom configuration. */
 	Custom UMETA(DisplayName = "Custom")
 };
 
+/**
+ * Ray marching quality levels.
+ * Controls MaxSteps and MinStepSize for volumetric rendering.
+ */
+UENUM(BlueprintType)
+enum class EIVSmokeRayMarchQuality : uint8
+{
+	/** Low quality: MaxSteps=128, MinStepSize=50 */
+	Low UMETA(DisplayName = "Low"),
+
+	/** Medium quality: MaxSteps=256, MinStepSize=25 */
+	Medium UMETA(DisplayName = "Medium"),
+
+	/** High quality: MaxSteps=512, MinStepSize=16 */
+	High UMETA(DisplayName = "High"),
+
+	/** User-defined parameters. */
+	Custom UMETA(DisplayName = "Custom")
+};
+
+/**
+ * Self-shadow quality levels.
+ * Controls light marching for internal smoke self-shadowing.
+ */
+UENUM(BlueprintType)
+enum class EIVSmokeSelfShadowQuality : uint8
+{
+	/** Disabled: No self-shadowing. */
+	Off UMETA(DisplayName = "Off"),
+
+	/** Low quality: LightMarchingSteps=3 */
+	Low UMETA(DisplayName = "Low"),
+
+	/** Medium quality: LightMarchingSteps=6 */
+	Medium UMETA(DisplayName = "Medium"),
+
+	/** High quality: LightMarchingSteps=8 */
+	High UMETA(DisplayName = "High"),
+
+	/** User-defined parameters. */
+	Custom UMETA(DisplayName = "Custom")
+};
+
+/**
+ * External shadow quality levels.
+ * Controls cascaded shadow map settings for external object shadows.
+ */
+UENUM(BlueprintType)
+enum class EIVSmokeExternalShadowQuality : uint8
+{
+	/** Disabled: No external shadows. */
+	Off UMETA(DisplayName = "Off"),
+
+	/** Low quality: NumCascades=3, Resolution=512, MaxDistance=20000 */
+	Low UMETA(DisplayName = "Low"),
+
+	/** Medium quality: NumCascades=4, Resolution=512, MaxDistance=30000 */
+	Medium UMETA(DisplayName = "Medium"),
+
+	/** High quality: NumCascades=4, Resolution=1024, MaxDistance=50000 */
+	High UMETA(DisplayName = "High"),
+
+	/** User-defined parameters. */
+	Custom UMETA(DisplayName = "Custom")
+};
+
+class UIVSmokeVisualMaterialPreset;
 /**
  * Global settings for IVSmoke plugin.
  * Accessible via Project Settings > Plugins > IVSmoke.
@@ -111,55 +142,113 @@ public:
 	virtual FName GetCategoryName() const override { return TEXT("Plugins"); }
 	virtual FName GetSectionName() const override { return TEXT("IVSmoke"); }
 
+	UIVSmokeVisualMaterialPreset* GetVisualMaterialPreset() const;
+
 #if WITH_EDITOR
 	virtual FText GetSectionText() const override { return NSLOCTEXT("IVSmoke", "SettingsSection", "IVSmoke"); }
 	virtual FText GetSectionDescription() const override { return NSLOCTEXT("IVSmoke", "SettingsDescription", "Configure IVSmoke volumetric smoke settings"); }
+	virtual void PostInitProperties() override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
 	//~==============================================================================
-	// Global
+	// General
 
 	/** Enable smoke rendering globally. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke")
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | General")
 	bool bEnableSmokeRendering = true;
 
 	/** Show advanced options in all categories. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke")
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | General")
 	bool bShowAdvancedOptions = false;
 
-	/** Quality preset for smoke rendering. Controls ray marching steps and step size. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke")
-	EIVSmokeQualityLevel QualityLevel = EIVSmokeQualityLevel::Medium;
+	/** Global quality preset. Sets all section quality levels at once. */
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Quality")
+	EIVSmokeGlobalQuality GlobalQuality = EIVSmokeGlobalQuality::Medium;
 
-	/** Maximum ray marching steps (32-1024). Only used when QualityLevel is Custom. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke", meta = (ClampMin = "32", ClampMax = "1024", EditCondition = "QualityLevel==EIVSmokeQualityLevel::Custom", EditConditionHides))
+	/** Ray marching quality level. */
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Quality",
+		meta = (EditCondition = "GlobalQuality==EIVSmokeGlobalQuality::Custom", EditConditionHides))
+	EIVSmokeRayMarchQuality RayMarchQuality = EIVSmokeRayMarchQuality::Medium;
+
+	/** Custom: Maximum ray marching steps (32-1024). */
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Quality",
+		meta = (ClampMin = "32", ClampMax = "1024",
+			EditCondition = "GlobalQuality==EIVSmokeGlobalQuality::Custom && RayMarchQuality==EIVSmokeRayMarchQuality::Custom",
+			EditConditionHides))
 	int32 CustomMaxSteps = 256;
 
-	/** Minimum step size in world units (5-100). Only used when QualityLevel is Custom. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke", meta = (ClampMin = "5.0", ClampMax = "100.0", EditCondition = "QualityLevel==EIVSmokeQualityLevel::Custom", EditConditionHides))
+	/** Custom: Minimum step size in world units (5-100). */
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Quality",
+		meta = (ClampMin = "5.0", ClampMax = "100.0",
+			EditCondition = "GlobalQuality==EIVSmokeGlobalQuality::Custom && RayMarchQuality==EIVSmokeRayMarchQuality::Custom",
+			EditConditionHides))
 	float CustomMinStepSize = 25.0f;
 
-	/** Get effective MaxSteps based on QualityLevel. */
-	int32 GetEffectiveMaxSteps() const;
+	/** Self-shadow quality level. */
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Quality",
+		meta = (EditCondition = "GlobalQuality==EIVSmokeGlobalQuality::Custom", EditConditionHides))
+	EIVSmokeSelfShadowQuality SelfShadowQuality = EIVSmokeSelfShadowQuality::Medium;
 
-	/** Get effective MinStepSize based on QualityLevel. */
-	float GetEffectiveMinStepSize() const;
+	/** Custom: Number of light marching steps (1-16). */
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Quality",
+		meta = (ClampMin = "1", ClampMax = "16",
+			EditCondition = "GlobalQuality==EIVSmokeGlobalQuality::Custom && SelfShadowQuality==EIVSmokeSelfShadowQuality::Custom",
+			EditConditionHides))
+	int32 CustomLightMarchingSteps = 6;
+
+	/** External shadow quality level. */
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Quality",
+		meta = (EditCondition = "GlobalQuality==EIVSmokeGlobalQuality::Custom", EditConditionHides))
+	EIVSmokeExternalShadowQuality ExternalShadowQuality = EIVSmokeExternalShadowQuality::Medium;
+
+	/** Custom: Number of shadow cascades (1-6). */
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Quality",
+		meta = (ClampMin = "1", ClampMax = "6",
+			EditCondition = "GlobalQuality==EIVSmokeGlobalQuality::Custom && ExternalShadowQuality==EIVSmokeExternalShadowQuality::Custom",
+			EditConditionHides))
+	int32 CustomNumCascades = 4;
+
+	/** Custom: Shadow map resolution per cascade (256-2048). */
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Quality",
+		meta = (ClampMin = "256", ClampMax = "2048",
+			EditCondition = "GlobalQuality==EIVSmokeGlobalQuality::Custom && ExternalShadowQuality==EIVSmokeExternalShadowQuality::Custom",
+			EditConditionHides))
+	int32 CustomCascadeResolution = 512;
+
+	/** Custom: Maximum shadow distance in centimeters (1000-100000). */
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Quality",
+		meta = (ClampMin = "1000", ClampMax = "100000",
+			EditCondition = "GlobalQuality==EIVSmokeGlobalQuality::Custom && ExternalShadowQuality==EIVSmokeExternalShadowQuality::Custom",
+			EditConditionHides))
+	float CustomShadowMaxDistance = 50000.0f;
 
 	//~==============================================================================
-	// Noise
+	// Quality Getters
 
-	/** Global noise settings for smoke texture generation. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Noise")
-	FIVSmokeNoiseSettings NoiseSettings;
+	/** Get effective MaxSteps based on quality settings. */
+	int32 GetEffectiveMaxSteps() const;
 
-	/** Whether to regenerate noise texture on startup. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Noise")
-	bool bRegenerateNoiseOnStartup = true;
+	/** Get effective MinStepSize based on quality settings. */
+	float GetEffectiveMinStepSize() const;
 
-	/** Noise UV multiplier for sampling. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Noise", meta = (ClampMin = "0.01", ClampMax = "10.0"))
-	float NoiseUVMul = 0.42f;
+	/** Check if self-shadowing is enabled based on quality settings. */
+	bool IsSelfShadowingEnabled() const;
+
+	/** Get effective light marching steps based on quality settings. */
+	int32 GetEffectiveLightMarchingSteps() const;
+
+	/** Check if external shadowing is enabled based on quality settings. */
+	bool IsExternalShadowingEnabled() const;
+
+	/** Get effective number of shadow cascades based on quality settings. */
+	int32 GetEffectiveNumCascades() const;
+
+	/** Get effective cascade resolution based on quality settings. */
+	int32 GetEffectiveCascadeResolution() const;
+
+	/** Get effective shadow max distance based on quality settings. */
+	float GetEffectiveShadowMaxDistance() const;
 
 	//~==============================================================================
 	// Appearance
@@ -170,7 +259,7 @@ public:
 
 	/** Scale for noise sampling. Affects smoke detail size. */
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Appearance", meta = (ClampMin = "1.0", ClampMax = "1000.0"))
-	float SmokeSize = 128.0f;
+	float SmokeSize = 256.0f;
 
 	/** Wind direction and speed for smoke animation. */
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Appearance")
@@ -179,7 +268,7 @@ public:
 	/** Sharpening/blurring of the smoke composite.
 	 *  Positive = sharpen, Zero = no filter, Negative = blur. */
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Appearance", meta = (ClampMin = "-1.0", ClampMax = "1.0"))
-	float Sharpness = 0.0f;
+	float Sharpness = 0.4f;
 
 	/** Volume edge range offset for density falloff. */
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Appearance", meta = (ClampMin = "0.0", ClampMax = "1.0", EditCondition = "bShowAdvancedOptions", EditConditionHides))
@@ -187,11 +276,11 @@ public:
 
 	/** Noise-based edge fade offset. */
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Appearance", meta = (ClampMin = "-1.0", ClampMax = "1.0", EditCondition = "bShowAdvancedOptions", EditConditionHides))
-	float VolumeEdgeNoiseFadeOffset = 0.04f;
+	float VolumeEdgeNoiseFadeOffset = 0.1f;
 
 	/** Edge fade sharpness factor. */
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Appearance", meta = (ClampMin = "0.1", ClampMax = "10.0", EditCondition = "bShowAdvancedOptions", EditConditionHides))
-	float VolumeEdgeFadeSharpness = 3.5f;
+	float VolumeEdgeFadeSharpness = 3.0f;
 
 	//~==============================================================================
 	// Lighting
@@ -228,106 +317,83 @@ public:
 	//~==============================================================================
 	// Self-Shadowing (Light Marching)
 
-	/** Enable self-shadowing (light marching) for more realistic smoke appearance. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | Self")
-	bool bEnableSelfShadowing = true;
-
-	/** Number of steps for light marching (1-16). Higher = better quality, lower performance. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | Self", meta = (ClampMin = "1", ClampMax = "16", EditCondition = "bEnableSelfShadowing", EditConditionHides))
-	int32 LightMarchingSteps = 6;
-
 	/** Minimum brightness in fully shadowed areas (0=dark, 1=no shadow). */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | Self", meta = (ClampMin = "0.0", ClampMax = "1.0", EditCondition = "bEnableSelfShadowing", EditConditionHides))
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | Self", meta = (ClampMin = "0.0", ClampMax = "1.0"))
 	float ShadowAmbient = 0.2f;
 
 	/** Maximum distance to march toward light (0=no limit). */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | Self", meta = (ClampMin = "0.0", ClampMax = "500.0", EditCondition = "bShowAdvancedOptions && bEnableSelfShadowing", EditConditionHides))
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | Self", meta = (ClampMin = "0.0", ClampMax = "500.0", EditCondition = "bShowAdvancedOptions", EditConditionHides))
 	float LightMarchingDistance = 0.0f;
 
 	/** Exponential distribution factor for light marching steps (1=uniform, 2-3=recommended). */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | Self", meta = (ClampMin = "1.0", ClampMax = "5.0", EditCondition = "bShowAdvancedOptions && bEnableSelfShadowing", EditConditionHides))
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | Self", meta = (ClampMin = "1.0", ClampMax = "5.0", EditCondition = "bShowAdvancedOptions", EditConditionHides))
 	float LightMarchingExpFactor = 2.0f;
 
 	//~==============================================================================
 	// External Shadows (Scene Capture)
 
-	/** Enable external object shadows (trees, buildings) via scene capture. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External")
-	bool bEnableExternalShadowing = false;
-
-	/** Number of shadow cascades (1-6). More cascades = smoother quality. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (ClampMin = "1", ClampMax = "6", EditCondition = "bEnableExternalShadowing", EditConditionHides))
-	int32 NumShadowCascades = 4;
-
-	/** Shadow map resolution per cascade. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (ClampMin = "256", ClampMax = "2048", EditCondition = "bEnableExternalShadowing", EditConditionHides))
-	int32 CascadeResolution = 512;
-
-	/** Maximum shadow distance in centimeters. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (ClampMin = "1000", ClampMax = "100000", EditCondition = "bEnableExternalShadowing", EditConditionHides))
-	float ShadowMaxDistance = 50000.0f;
-
 	/** Minimum brightness in externally shadowed areas (0=dark, 1=no shadow). */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (ClampMin = "0.0", ClampMax = "1.0", EditCondition = "bEnableExternalShadowing", EditConditionHides))
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (ClampMin = "0.0", ClampMax = "1.0"))
 	float ExternalShadowAmbient = 0.3f;
 
 	/** Enable Variance Shadow Maps for soft shadows. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (EditCondition = "bEnableExternalShadowing", EditConditionHides))
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External")
 	bool bEnableVSM = true;
 
 	/** VSM blur kernel radius (0=no blur). Higher = softer shadows. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (ClampMin = "0", ClampMax = "8", EditCondition = "bEnableExternalShadowing && bEnableVSM", EditConditionHides))
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (ClampMin = "0", ClampMax = "8", EditCondition = "bEnableVSM", EditConditionHides))
 	int32 VSMBlurRadius = 2;
 
 	/** Shadow depth bias to prevent shadow acne. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (ClampMin = "0.0", ClampMax = "100.0", EditCondition = "bShowAdvancedOptions && bEnableExternalShadowing", EditConditionHides))
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (ClampMin = "0.0", ClampMax = "100.0", EditCondition = "bShowAdvancedOptions", EditConditionHides))
 	float ShadowDepthBias = 1.0f;
 
 	/** Include skeletal meshes (characters) in shadow capture. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (EditCondition = "bShowAdvancedOptions && bEnableExternalShadowing", EditConditionHides))
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (EditCondition = "bShowAdvancedOptions", EditConditionHides))
 	bool bCaptureSkeletalMeshes = false;
 
 	/** Log/Linear cascade split blend (0=linear, 1=logarithmic). */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (ClampMin = "0.0", ClampMax = "1.0", EditCondition = "bShowAdvancedOptions && bEnableExternalShadowing", EditConditionHides))
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (ClampMin = "0.0", ClampMax = "1.0", EditCondition = "bShowAdvancedOptions", EditConditionHides))
 	float CascadeLogLinearBlend = 0.85f;
 
 	/** Blend region at cascade boundaries (0-0.3). */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (ClampMin = "0.0", ClampMax = "0.3", EditCondition = "bShowAdvancedOptions && bEnableExternalShadowing", EditConditionHides))
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (ClampMin = "0.0", ClampMax = "0.3", EditCondition = "bShowAdvancedOptions", EditConditionHides))
 	float CascadeBlendRange = 0.1f;
 
 	/** Minimum variance for VSM to prevent artifacts. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (ClampMin = "0.01", ClampMax = "100.0", EditCondition = "bShowAdvancedOptions && bEnableExternalShadowing && bEnableVSM", EditConditionHides))
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (ClampMin = "0.01", ClampMax = "100.0", EditCondition = "bShowAdvancedOptions && bEnableVSM", EditConditionHides))
 	float VSMMinVariance = 1.0f;
 
 	/** VSM light bleeding reduction (0=none). */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (ClampMin = "0.0", ClampMax = "0.5", EditCondition = "bShowAdvancedOptions && bEnableExternalShadowing && bEnableVSM", EditConditionHides))
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (ClampMin = "0.0", ClampMax = "0.5", EditCondition = "bShowAdvancedOptions && bEnableVSM", EditConditionHides))
 	float VSMLightBleedingReduction = 0.2f;
 
-	/** Enable priority-based cascade updates for performance. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (EditCondition = "bShowAdvancedOptions && bEnableExternalShadowing", EditConditionHides))
-	bool bEnablePriorityUpdate = true;
+	// TODO: Priority Update system disabled - causes shadow flickering due to texel snapping
+	// synchronization issues. Properties kept for serialization compatibility.
+	// See IVSmokeCSMRenderer::UpdateCascadePriorities for details.
 
-	/** Near cascade update interval (frames). */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (ClampMin = "1", ClampMax = "4", EditCondition = "bShowAdvancedOptions && bEnableExternalShadowing && bEnablePriorityUpdate", EditConditionHides))
+	UPROPERTY()
+	bool bEnablePriorityUpdate = false;
+
+	UPROPERTY()
 	int32 NearCascadeUpdateInterval = 1;
 
-	/** Far cascade update interval (frames). */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Shadows | External", meta = (ClampMin = "1", ClampMax = "16", EditCondition = "bShowAdvancedOptions && bEnableExternalShadowing && bEnablePriorityUpdate", EditConditionHides))
+	UPROPERTY()
 	int32 FarCascadeUpdateInterval = 4;
 
 	//~==============================================================================
 	// Post Processing (Voxel FXAA)
 
 	/** FXAA maximum edge search distance. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | PostProcessing", meta = (ClampMin = "0.0", ClampMax = "4.0"))
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | PostProcessing", meta = (ClampMin = "0.0", ClampMax = "4.0", EditCondition = "bShowAdvancedOptions", EditConditionHides))
 	float FXAASpanMax = 4.0f;
 
 	/** FXAA edge detection threshold range. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | PostProcessing", meta = (ClampMin = "0.0", ClampMax = "8.0"))
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | PostProcessing", meta = (ClampMin = "0.0", ClampMax = "8.0", EditCondition = "bShowAdvancedOptions", EditConditionHides))
 	float FXAARange = 1.2f;
 
 	/** FXAA sharpness factor. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | PostProcessing", meta = (ClampMin = "0.1", ClampMax = "8.0"))
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | PostProcessing", meta = (ClampMin = "0.1", ClampMax = "8.0", EditCondition = "bShowAdvancedOptions", EditConditionHides))
 	float FXAASharpness = 1.7f;
 
 	//~==============================================================================
@@ -337,9 +403,14 @@ public:
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Rendering")
 	EIVSmokeRenderPass RenderPass = EIVSmokeRenderPass::AfterDOF;
 
+	/** Smoke visual material data asset. */
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Rendering")
+	FSoftObjectPath SmokeVisualMaterialPreset;
+
+
 	/** Use CustomDepth for depth-based sorting with particles.
 	 *  Only available when RenderPass = TranslucencyAfterDOF. */
-	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Rendering", meta = (DisplayName = "Use CustomDepth Sorting", EditCondition = "bShowAdvancedOptions && RenderPass==EIVSmokeRenderPass::TranslucencyAfterDOF", EditConditionHides))
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Rendering", meta = (DisplayName = "Use CustomDepth Sorting", EditCondition = "RenderPass==EIVSmokeRenderPass::TranslucencyAfterDOF", EditConditionHides))
 	bool bUseCustomDepthBasedSorting = false;
 
 	//~==============================================================================
@@ -348,4 +419,10 @@ public:
 	/** Show debug visualization for smoke volumes. */
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "IVSmoke | Debug")
 	bool bShowDebugVolumes = false;
+
+
+private:
+
+	/** Cached smoke visual material preset. */
+	UIVSmokeVisualMaterialPreset* CachedVisualMaterialPreset;
 };

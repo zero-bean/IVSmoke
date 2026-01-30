@@ -3,16 +3,18 @@
 #include "IVSmokeHoleGeneratorComponent.h"
 
 #include "Engine/TextureRenderTargetVolume.h"
+#include "Engine/Texture2D.h"
 #include "Engine/World.h"
 #include "GameFramework/GameStateBase.h"
 #include "GlobalShader.h"
 #include "IVSmoke.h"
-#include "IVSmokeHoleCarveCS.h"
+#include "IVSmokeHoleShaders.h"
 #include "IVSmokeHolePreset.h"
 #include "IVSmokePostProcessPass.h"
 #include "IVSmokeVoxelVolume.h"
 #include "Net/UnrealNetwork.h"
 #include "RHICommandList.h"
+#include "RHIStaticStates.h"
 #include "RenderGraphBuilder.h"
 #include "RenderGraphUtils.h"
 #include "RenderingThread.h"
@@ -23,6 +25,16 @@ UIVSmokeHoleGeneratorComponent::UIVSmokeHoleGeneratorComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	SetIsReplicatedByDefault(true);
+	SetGenerateOverlapEvents(true);
+}
+
+void UIVSmokeHoleGeneratorComponent::PostInitProperties()
+{
+	Super::PostInitProperties();
+
+	// Prevent projectiles from being blocked by this box
+	SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	SetCollisionResponseToAllChannels(ECR_Overlap);
 }
 
 void UIVSmokeHoleGeneratorComponent::BeginPlay()
@@ -66,9 +78,16 @@ void UIVSmokeHoleGeneratorComponent::TickComponent(const float DeltaTime, const 
 
 	// 4. Client & Standalone rebuild texture
 #if !UE_SERVER
-	if (bHoleTextureDirty && ActiveHoles.Num() > 0)
+	if (bHoleTextureDirty)
 	{
-		Local_RebuildHoleTexture();
+		if (ActiveHoles.Num() > 0)
+		{
+			Local_RebuildHoleTexture();
+		}
+		else
+		{
+			Local_ClearHoleTexture();
+		}
 		MarkHoleTextureDirty(false);
 	}
 #endif
@@ -88,91 +107,50 @@ void UIVSmokeHoleGeneratorComponent::GetLifetimeReplicatedProps(TArray<FLifetime
 //~============================================================================
 // Public API (Blueprint & C++)
 #pragma region API
-void UIVSmokeHoleGeneratorComponent::RequestPenetrationHole(const FVector3f InOrigin, const FVector3f Direction, UIVSmokeHolePreset* Preset)
+void UIVSmokeHoleGeneratorComponent::Reset()
 {
-	if (!Preset)
-	{
-		UE_LOG(LogIVSmoke, Warning, TEXT("[RequestPenetrationHole] Preset is null"));
-		return;
-	}
+	// 1. Clear all active holes
+	ActiveHoles.Empty();
 
-	if (Preset->HoleType != EIVSmokeHoleType::Penetration)
-	{
-		UE_LOG(LogIVSmoke, Warning, TEXT("[RequestPenetrationHole] Preset is not Penetration type"));
-		return;
-	}
+	// 2. Clear all dynamic subjects
+	DynamicSubjectList.Empty();
 
-	Internal_RequestPenetrationHole(InOrigin, Direction, Preset->GetPresetID());
-}
+	// 3. Clear hole texture
+#if !UE_SERVER
+	Local_ClearHoleTexture();
+#endif
 
-void UIVSmokeHoleGeneratorComponent::RequestExplosionHole(const FVector3f Origin, UIVSmokeHolePreset* Preset)
-{
-	if (!Preset)
-	{
-		UE_LOG(LogIVSmoke, Warning, TEXT("[RequestExplosionHole] Preset is null"));
-		return;
-	}
-
-	if (Preset->HoleType != EIVSmokeHoleType::Explosion)
-	{
-		UE_LOG(LogIVSmoke, Warning, TEXT("[RequestExplosionHole] Preset is not Explosion type"));
-		return;
-	}
-
-	Internal_RequestExplosionHole(Origin, Preset->GetPresetID());
-}
-
-void UIVSmokeHoleGeneratorComponent::RequestTrackDynamicObject(AActor* TargetActor, UIVSmokeHolePreset* Preset)
-{
-	if (!TargetActor)
-	{
-		UE_LOG(LogIVSmoke, Warning, TEXT("[RequestTrackDynamicObject] TargetActor is null"));
-		return;
-	}
-
-	if (!Preset)
-	{
-		UE_LOG(LogIVSmoke, Warning, TEXT("[RequestTrackDynamicObject] Preset is null"));
-		return;
-	}
-
-	if (Preset->HoleType != EIVSmokeHoleType::Dynamic)
-	{
-		UE_LOG(LogIVSmoke, Warning, TEXT("[RequestTrackDynamicObject] Preset is not Dynamic type"));
-		return;
-	}
-
-	Internal_RequestDynamicHole(TargetActor, Preset->GetPresetID());
+	MarkHoleTextureDirty(false);
 }
 #pragma endregion
 
 //~============================================================================
-// Internal Server RPC
-#pragma region Server RPC
-void UIVSmokeHoleGeneratorComponent::Internal_RequestPenetrationHole_Implementation(const FVector3f& InOrigin, const FVector3f& InDirection, const uint8 PresetID)
+// Public API Called by UIVSmokeHoleRequestComponent
+#pragma region API
+void UIVSmokeHoleGeneratorComponent::CreatePenetrationHole(const FVector3f& InOrigin, const FVector3f& InDirection, const uint8 PresetID)
 {
 	const TObjectPtr<UIVSmokeHolePreset> Preset = UIVSmokeHolePreset::FindByID(PresetID);
 	if (!Preset)
 	{
-		UE_LOG(LogIVSmoke, Warning, TEXT("[Internal_RequestPenetrationHole] Invalid PresetID: %d"), PresetID);
+		UE_LOG(LogIVSmoke, Warning, TEXT("[CreatePenetrationHole] Invalid PresetID: %d"), PresetID);
 		return;
 	}
 
 	if (Preset->Duration <= 0.0f)
 	{
-		UE_LOG(LogIVSmoke, Warning, TEXT("[Internal_RequestPenetrationHole] Invalid Lifetime: %f"), Preset->Duration);
+		UE_LOG(LogIVSmoke, Warning, TEXT("[CreatePenetrationHole] Invalid Lifetime: %f"), Preset->Duration);
 		return;
 	}
 
 	if (Preset->HoleType != EIVSmokeHoleType::Penetration)
 	{
-		UE_LOG(LogIVSmoke, Warning, TEXT("[Internal_RequestPenetrationHole] Preset is not Penetration type"));
+		UE_LOG(LogIVSmoke, Warning, TEXT("[CreatePenetrationHole] Preset is not Penetration type"));
 		return;
 	}
 
 	// 1. Check whether it passes through the smoke volume
 	FVector3f EntryPoint, ExitPoint;
-	if (!Authority_CalculatePenetrationPoints(InOrigin, InDirection, Preset->Radius, EntryPoint, ExitPoint))
+	if (!Authority_CalculatePenetrationPoints(InOrigin, InDirection, Preset->BulletThickness, EntryPoint, ExitPoint))
 	{
 		return;
 	}
@@ -186,24 +164,24 @@ void UIVSmokeHoleGeneratorComponent::Internal_RequestPenetrationHole_Implementat
 	Authority_CreateHole(HoleData);
 }
 
-void UIVSmokeHoleGeneratorComponent::Internal_RequestExplosionHole_Implementation(const FVector3f& Origin, const uint8 PresetID)
+void UIVSmokeHoleGeneratorComponent::CreateExplosionHole(const FVector3f& Origin, const uint8 PresetID)
 {
 	const TObjectPtr<UIVSmokeHolePreset> Preset = UIVSmokeHolePreset::FindByID(PresetID);
 	if (!Preset)
 	{
-		UE_LOG(LogIVSmoke, Warning, TEXT("[Internal_RequestExplosionHole] Invalid PresetID: %d"), PresetID);
+		UE_LOG(LogIVSmoke, Warning, TEXT("[CreateExplosionHole] Invalid PresetID: %d"), PresetID);
 		return;
 	}
 
 	if (Preset->Duration <= 0.0f)
 	{
-		UE_LOG(LogIVSmoke, Warning, TEXT("[Internal_RequestExplosionHole] Invalid Lifetime: %f"), Preset->Duration);
+		UE_LOG(LogIVSmoke, Warning, TEXT("[CreateExplosionHole] Invalid Lifetime: %f"), Preset->Duration);
 		return;
 	}
 
 	if (Preset->HoleType != EIVSmokeHoleType::Explosion)
 	{
-		UE_LOG(LogIVSmoke, Warning, TEXT("[Internal_RequestExplosionHole] Preset is not Explosion type"));
+		UE_LOG(LogIVSmoke, Warning, TEXT("[CreateExplosionHole] Preset is not Explosion type"));
 		return;
 	}
 
@@ -225,24 +203,24 @@ void UIVSmokeHoleGeneratorComponent::Internal_RequestExplosionHole_Implementatio
 	Authority_CreateHole(HoleData);
 }
 
-void UIVSmokeHoleGeneratorComponent::Internal_RequestDynamicHole_Implementation(AActor* TargetActor, const uint8 PresetID)
+void UIVSmokeHoleGeneratorComponent::RegisterTrackDynamicHole(AActor* TargetActor, const uint8 PresetID)
 {
 	const TObjectPtr<UIVSmokeHolePreset> Preset = UIVSmokeHolePreset::FindByID(PresetID);
 	if (!Preset)
 	{
-		UE_LOG(LogIVSmoke, Warning, TEXT("[Internal_RequestDynamicHole] Invalid PresetID: %d"), PresetID);
+		UE_LOG(LogIVSmoke, Warning, TEXT("[RegisterTrackDynamicHole] Invalid PresetID: %d"), PresetID);
 		return;
 	}
 
 	if (Preset->Duration <= 0.0f)
 	{
-		UE_LOG(LogIVSmoke, Warning, TEXT("[Internal_RequestDynamicHole] Invalid Duration: %f"), Preset->Duration);
+		UE_LOG(LogIVSmoke, Warning, TEXT("[RegisterTrackDynamicHole] Invalid Duration: %f"), Preset->Duration);
 		return;
 	}
 
 	if (Preset->HoleType != EIVSmokeHoleType::Dynamic)
 	{
-		UE_LOG(LogIVSmoke, Warning, TEXT("[Internal_RequestDynamicHole] Preset is not Dynamic type"));
+		UE_LOG(LogIVSmoke, Warning, TEXT("[RegisterTrackDynamicHole] Preset is not Dynamic type"));
 		return;
 	}
 
@@ -251,7 +229,7 @@ void UIVSmokeHoleGeneratorComponent::Internal_RequestDynamicHole_Implementation(
 	{
 		if (Tracker.TargetActor == TargetActor)
 		{
-			UE_LOG(LogIVSmoke, Warning, TEXT("[Internal_RequestDynamicHole] Actor already registered"));
+			UE_LOG(LogIVSmoke, Warning, TEXT("[RegisterTrackDynamicHole] Actor already registered"));
 			return;
 		}
 	}
@@ -315,7 +293,7 @@ void UIVSmokeHoleGeneratorComponent::Authority_CleanupExpiredHoles()
 }
 
 bool UIVSmokeHoleGeneratorComponent::Authority_CalculatePenetrationPoints(
-	const FVector3f& Origin, const FVector3f& Direction, const float Radius, FVector3f& OutEntry, FVector3f& OutExit)
+	const FVector3f& Origin, const FVector3f& Direction, const float BulletThickness, FVector3f& OutEntry, FVector3f& OutExit)
 {
 	FVector3f NormalizedDirection = Direction.GetSafeNormal();
 	if (NormalizedDirection.IsNearlyZero())
@@ -355,16 +333,27 @@ bool UIVSmokeHoleGeneratorComponent::Authority_CalculatePenetrationPoints(
 	// 3. Obstacle detection using SphereTrace between Entry and Exit
 	if (ObstacleObjectTypes.Num() > 0)
 	{
-		FHitResult ObstacleHit;
+		TArray<FHitResult> HitResults;
 		FCollisionQueryParams WorldParams;
-		const FCollisionShape SweepShape = FCollisionShape::MakeSphere(Radius);
+		WorldParams.AddIgnoredComponent(this);
+		const FCollisionShape SweepShape = FCollisionShape::MakeSphere(BulletThickness);
 		const FCollisionObjectQueryParams ObjectParams(ObstacleObjectTypes);
 
-		if (GetWorld()->SweepSingleByObjectType(
-			ObstacleHit, FVector(OutEntry), FVector(OutExit), FQuat::Identity,
+		if (GetWorld()->SweepMultiByObjectType(
+			HitResults, FVector(OutEntry), FVector(OutExit), FQuat::Identity,
 			ObjectParams, SweepShape, WorldParams))
 		{
-			OutExit = FVector3f(ObstacleHit.Location);
+			for (const FHitResult& Hit : HitResults)
+			{
+				if (AActor* HitActor = Hit.GetActor())
+				{
+					if (!HitActor->ActorHasTag(IVSmokeVoxelVolumeTag))
+					{
+						OutExit = FVector3f(Hit.Location);
+						break;
+					}
+				}
+			}
 		}
 	}
 
@@ -446,10 +435,54 @@ void UIVSmokeHoleGeneratorComponent::Local_InitializeHoleTexture()
 	HoleTexture->UpdateResourceImmediate(true);
 }
 
+void UIVSmokeHoleGeneratorComponent::Local_ClearHoleTexture()
+{
+	if (!HoleTexture)
+	{
+		return;
+	}
+
+	FTextureRenderTargetResource* RenderTargetResource = HoleTexture->GameThread_GetRenderTargetResource();
+	if (!RenderTargetResource)
+	{
+		return;
+	}
+
+	FTextureRHIRef Texture = RenderTargetResource->GetRenderTargetTexture();
+	if (!Texture.IsValid())
+	{
+		return;
+	}
+
+	ENQUEUE_RENDER_COMMAND(IVSmokeHoleClear)(
+		[Texture](FRHICommandListImmediate& RHICmdList)
+		{
+			FRDGBuilder GraphBuilder(RHICmdList);
+
+			const FRDGTextureRef RDGTexture = GraphBuilder.RegisterExternalTexture(
+				CreateRenderTarget(Texture, TEXT("IVSmokeHoleTextureClear"))
+			);
+
+			// Clear to white (1,1,1,1) = no holes = full smoke density
+			AddClearUAVPass(GraphBuilder, GraphBuilder.CreateUAV(RDGTexture), FVector4f(1.0f, 1.0f, 1.0f, 1.0f));
+
+			GraphBuilder.Execute();
+		}
+	);
+}
+
 void UIVSmokeHoleGeneratorComponent::Local_RebuildHoleTexture()
 {
 	if (!HoleTexture)
 	{
+		return;
+	}
+
+	if (HoleTexture->SizeX != VoxelResolution.X ||
+		HoleTexture->SizeY != VoxelResolution.Y ||
+		HoleTexture->SizeZ != VoxelResolution.Z)
+	{
+		Local_InitializeHoleTexture();
 		return;
 	}
 
@@ -467,15 +500,39 @@ void UIVSmokeHoleGeneratorComponent::Local_RebuildHoleTexture()
 		return;
 	}
 
+	FTextureRHIRef Texture = RenderTargetResource->GetRenderTargetTexture();
+	if (!Texture.IsValid())
+	{
+		return;
+	}
+
 	const FVector3f WorldVolumeMin = FVector3f(VoxelVolume->GetVoxelWorldAABBMin());
 	const FVector3f WorldVolumeMax = FVector3f(VoxelVolume->GetVoxelWorldAABBMax());
-
 	const FIntVector Resolution = VoxelResolution;
 	const int32 NumHoles = ActiveHoles.Num();
-	FTextureRHIRef Texture = RenderTargetResource->GetRenderTargetTexture();
+	const int32 CapturedBlurStep = BlurStep;
+
+	// Capture noise settings for render thread
+	FTextureRHIRef PenetrationNoiseTextureRHI = PenetrationNoise.Texture && PenetrationNoise.Texture->GetResource()
+		? PenetrationNoise.Texture->GetResource()->TextureRHI : nullptr;
+	FTextureRHIRef ExplosionNoiseTextureRHI = ExplosionNoise.Texture && ExplosionNoise.Texture->GetResource()
+		? ExplosionNoise.Texture->GetResource()->TextureRHI : nullptr;
+	FTextureRHIRef DynamicNoiseTextureRHI = DynamicNoise.Texture && DynamicNoise.Texture->GetResource()
+		? DynamicNoise.Texture->GetResource()->TextureRHI : nullptr;
+
+	const float CapturedPenetrationNoiseStrength = PenetrationNoise.Strength;
+	const float CapturedPenetrationNoiseScale = PenetrationNoise.Scale;
+	const float CapturedExplosionNoiseStrength = ExplosionNoise.Strength;
+	const float CapturedExplosionNoiseScale = ExplosionNoise.Scale;
+	const float CapturedDynamicNoiseStrength = DynamicNoise.Strength;
+	const float CapturedDynamicNoiseScale = DynamicNoise.Scale;
 
 	ENQUEUE_RENDER_COMMAND(IVSmokeHoleCarveFullRebuild)(
-		[Texture, GPUHoles = MoveTemp(GPUHoles), WorldVolumeMin, WorldVolumeMax, Resolution, NumHoles]
+		[Texture, GPUHoles = MoveTemp(GPUHoles), WorldVolumeMin, WorldVolumeMax, Resolution, NumHoles, CapturedBlurStep,
+		 PenetrationNoiseTextureRHI, ExplosionNoiseTextureRHI, DynamicNoiseTextureRHI,
+		 CapturedPenetrationNoiseStrength, CapturedPenetrationNoiseScale,
+		 CapturedExplosionNoiseStrength, CapturedExplosionNoiseScale,
+		 CapturedDynamicNoiseStrength, CapturedDynamicNoiseScale]
 		(FRHICommandListImmediate& RHICmdList)
 		{
 			FRDGBuilder GraphBuilder(RHICmdList);
@@ -493,16 +550,84 @@ void UIVSmokeHoleGeneratorComponent::Local_RebuildHoleTexture()
 				sizeof(FIVSmokeHoleGPU) * GPUHoles.Num()
 			);
 
-			FIVSmokeHoleCarveCS::FParameters* Parameters = GraphBuilder.AllocParameters<FIVSmokeHoleCarveCS::FParameters>();
-			Parameters->VolumeTexture = GraphBuilder.CreateUAV(RDGTexture);
-			Parameters->HoleBuffer = GraphBuilder.CreateSRV(HoleBuffer);
-			Parameters->VolumeMin = WorldVolumeMin;
-			Parameters->VolumeMax = WorldVolumeMax;
-			Parameters->Resolution = Resolution;
-			Parameters->NumHoles = NumHoles;
+			// ============================================================================
+			// Pass 1: Hole Carve
+			// ============================================================================
+			FIVSmokeHoleCarveCS::FParameters* CarveParameters = GraphBuilder.AllocParameters<FIVSmokeHoleCarveCS::FParameters>();
+			CarveParameters->VolumeTexture = GraphBuilder.CreateUAV(RDGTexture);
+			CarveParameters->HoleBuffer = GraphBuilder.CreateSRV(HoleBuffer);
+			CarveParameters->VolumeMin = WorldVolumeMin;
+			CarveParameters->VolumeMax = WorldVolumeMax;
+			CarveParameters->Resolution = Resolution;
+			CarveParameters->NumHoles = NumHoles;
 
-			const TShaderMapRef<FIVSmokeHoleCarveCS> ComputeShader(GetGlobalShaderMap(GMaxRHIFeatureLevel));
-			FIVSmokePostProcessPass::AddComputeShaderPass<FIVSmokeHoleCarveCS>(GraphBuilder, GetGlobalShaderMap(GMaxRHIFeatureLevel), ComputeShader, Parameters, Resolution);
+			// Noise textures (use GWhiteTexture as fallback for null textures)
+			CarveParameters->PenetrationNoiseTexture = PenetrationNoiseTextureRHI ? PenetrationNoiseTextureRHI : GWhiteTexture->TextureRHI;
+			CarveParameters->ExplosionNoiseTexture = ExplosionNoiseTextureRHI ? ExplosionNoiseTextureRHI : GWhiteTexture->TextureRHI;
+			CarveParameters->DynamicNoiseTexture = DynamicNoiseTextureRHI ? DynamicNoiseTextureRHI : GWhiteTexture->TextureRHI;
+			CarveParameters->NoiseSampler = TStaticSamplerState<SF_Bilinear, AM_Wrap, AM_Wrap, AM_Wrap>::GetRHI();
+
+			// Noise parameters
+			CarveParameters->PenetrationNoiseStrength = CapturedPenetrationNoiseStrength;
+			CarveParameters->PenetrationNoiseScale = CapturedPenetrationNoiseScale;
+			CarveParameters->ExplosionNoiseStrength = CapturedExplosionNoiseStrength;
+			CarveParameters->ExplosionNoiseScale = CapturedExplosionNoiseScale;
+			CarveParameters->DynamicNoiseStrength = CapturedDynamicNoiseStrength;
+			CarveParameters->DynamicNoiseScale = CapturedDynamicNoiseScale;
+
+			const TShaderMapRef<FIVSmokeHoleCarveCS> CarveShader(GetGlobalShaderMap(GMaxRHIFeatureLevel));
+			FIVSmokePostProcessPass::AddComputeShaderPass<FIVSmokeHoleCarveCS>(GraphBuilder, GetGlobalShaderMap(GMaxRHIFeatureLevel), CarveShader, CarveParameters, Resolution);
+
+			// ============================================================================
+			// Pass 2-4: Separable Gaussian Blur (X, Y, Z)
+			// ============================================================================
+			if (CapturedBlurStep > 0)
+			{
+				// Create ping-pong texture for blur
+				const FRDGTextureDesc BlurTexDesc = FRDGTextureDesc::Create3D(
+					FIntVector(Resolution.X, Resolution.Y, Resolution.Z),
+					PF_FloatRGBA,
+					FClearValueBinding::Black,
+					TexCreate_ShaderResource | TexCreate_UAV
+				);
+				const FRDGTextureRef BlurTempTexture = GraphBuilder.CreateTexture(BlurTexDesc, TEXT("IVSmokeHoleBlurTemp"));
+
+				const TShaderMapRef<FIVSmokeHoleBlurCS> BlurShader(GetGlobalShaderMap(GMaxRHIFeatureLevel));
+				FRHISamplerState* LinearClampSampler = TStaticSamplerState<SF_Bilinear, AM_Clamp, AM_Clamp, AM_Clamp>::GetRHI();
+
+				// Blur directions
+				const FIntVector BlurDirections[3] = {
+					FIntVector(1, 0, 0),  // X
+					FIntVector(0, 1, 0),  // Y
+					FIntVector(0, 0, 1)   // Z
+				};
+
+				const FRDGTextureRef PingPong[2] = { RDGTexture, BlurTempTexture };
+				int32 CurrentInput = 0;
+
+				for (int32 i = 0; i < 3; ++i)
+				{
+					FIVSmokeHoleBlurCS::FParameters* BlurParameters = GraphBuilder.AllocParameters<FIVSmokeHoleBlurCS::FParameters>();
+					BlurParameters->InputTexture = GraphBuilder.CreateSRV(PingPong[CurrentInput]);
+					BlurParameters->InputSampler = LinearClampSampler;
+					BlurParameters->OutputTexture = GraphBuilder.CreateUAV(PingPong[1 - CurrentInput]);
+					BlurParameters->Resolution = Resolution;
+					BlurParameters->BlurDirection = BlurDirections[i];
+					BlurParameters->BlurStep = CapturedBlurStep;
+
+					FIVSmokePostProcessPass::AddComputeShaderPass<FIVSmokeHoleBlurCS>(GraphBuilder,
+						GetGlobalShaderMap(GMaxRHIFeatureLevel), BlurShader, BlurParameters, Resolution);
+
+					CurrentInput = 1 - CurrentInput;
+				}
+
+				// If final result is in BlurTempTexture (CurrentInput == 1), copy back to RDGTexture
+				if (CurrentInput == 1)
+				{
+					AddCopyTexturePass(GraphBuilder, BlurTempTexture, RDGTexture, FRHICopyTextureInfo());
+				}
+			}
+
 			GraphBuilder.Execute();
 		}
 	);

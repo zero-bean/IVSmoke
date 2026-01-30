@@ -119,10 +119,14 @@ public:
 		SHADER_PARAMETER(FIntVector, TexSize)
 		/** Voxel resolution per volume. */
 		SHADER_PARAMETER(FIntVector, VoxelResolution)
-		/** Number of volumes packed per row in atlas. */
+		/** Spacing between volumes in atlas. */
 		SHADER_PARAMETER(int32, PackedInterval)
+		/** Number of volumes per axis in atlas (3D grid layout). */
+		SHADER_PARAMETER(FIntVector, VoxelAtlasCount)
 		/** Current game time for fade animation calculation. */
 		SHADER_PARAMETER(float, GameTime)
+		/** Number of active volumes (for bounds checking). */
+		SHADER_PARAMETER(int32, VolumeCount)
 	END_SHADER_PARAMETER_STRUCT()
 
 public:
@@ -160,33 +164,34 @@ public:
 	END_SHADER_PARAMETER_STRUCT()
 };
 
-class IVSMOKE_API FIVSmokeSharpenCompositePS : public FGlobalShader
+class IVSMOKE_API FIVSmokeCompositePS : public FGlobalShader
 {
 public:
-	static constexpr const TCHAR* EventName = TEXT("IVSmokeSharpenCompositePS");
+	static constexpr const TCHAR* EventName = TEXT("IVSmokeCompositePS");
 	static FRHIBlendState* GetBlendState()
 	{
 		return TStaticBlendState<>::GetRHI();
 	}
 
-	DECLARE_GLOBAL_SHADER(FIVSmokeSharpenCompositePS);
-	SHADER_USE_PARAMETER_STRUCT(FIVSmokeSharpenCompositePS, FGlobalShader);
-
+	DECLARE_GLOBAL_SHADER(FIVSmokeCompositePS);
+	SHADER_USE_PARAMETER_STRUCT(FIVSmokeCompositePS, FGlobalShader);
 	BEGIN_SHADER_PARAMETER_STRUCT(FParameters, )
 		/** Scene color texture (background). */
 		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, SceneTex)
 		/** Smoke albedo (color) from ray marching. */
-		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, SmokeAlbedoTex)
-		/** Smoke opacity mask from ray marching. */
-		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, SmokeMaskTex)
+		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, SmokeTex)
+		/** Smoke (LocalPos, Alpha) from ray marching. */
+		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, SmokeLocalPosAlphaTex)
 		/** Linear sampler with repeat addressing. */
-		SHADER_PARAMETER_SAMPLER(SamplerState, LinearRepeat_Sampler)
-		/** Sharpen/blur amount (-1 to 1, 0 = no filter). */
-		SHADER_PARAMETER(float, Sharpness)
+		SHADER_PARAMETER_SAMPLER(SamplerState, LinearClamp_Sampler)
 		/** Viewport size for UV calculation. */
 		SHADER_PARAMETER(FVector2f, ViewportSize)
 		/** View rect offset for multi-view support. */
 		SHADER_PARAMETER(FVector2f, ViewRectMin)
+		/** Alpha processing type in composite pass. */
+		SHADER_PARAMETER(int, AlphaType)
+		/** Minimum alpha threshold for rendering. Pixels with alpha below this value will be discarded. Only used when VisualAlphaType is CutOff. */
+		SHADER_PARAMETER(float, AlphaThreshold)
 		RENDER_TARGET_BINDING_SLOTS()
 	END_SHADER_PARAMETER_STRUCT()
 
@@ -225,6 +230,45 @@ public:
 	}
 };
 
+class IVSMOKE_API FIVSmokeUpsampleFilterPS : public FGlobalShader
+{
+public:
+	static constexpr const TCHAR* EventName = TEXT("IVSmokeUpsampleFilterPS");
+	static FRHIBlendState* GetBlendState()
+	{
+		return TStaticBlendState<>::GetRHI();
+	}
+
+	DECLARE_GLOBAL_SHADER(FIVSmokeUpsampleFilterPS);
+	SHADER_USE_PARAMETER_STRUCT(FIVSmokeUpsampleFilterPS, FGlobalShader);
+
+	BEGIN_SHADER_PARAMETER_STRUCT(FParameters, )
+		/** Scene color texture. */
+		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, SceneTex)
+		/** Smoke albedo (color) from ray marching. */
+		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, SmokeAlbedoTex)
+		/** Smoke opacity mask from ray marching. */
+		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, SmokeLocalPosAlphaTex)
+		/** Linear sampler with repeat addressing. */
+		SHADER_PARAMETER_SAMPLER(SamplerState, LinearClamp_Sampler)
+		/** Sharpen/blur amount (-1 to 1, 0 = no filter). */
+		SHADER_PARAMETER(float, Sharpness)
+		/** Viewport size for UV calculation. */
+		SHADER_PARAMETER(FVector2f, ViewportSize)
+		/** View rect offset for multi-view support. */
+		SHADER_PARAMETER(FVector2f, ViewRectMin)
+		/** Upper bound threshold for low-opacity remapping to suppress HDR burn-through and low-density artifacts. */
+		SHADER_PARAMETER(float, LowOpacityRemapThreshold)
+		RENDER_TARGET_BINDING_SLOTS()
+	END_SHADER_PARAMETER_STRUCT()
+
+public:
+	static bool ShouldCompilePermutation(const FGlobalShaderPermutationParameters& Parameters)
+	{
+		return IsFeatureLevelSupported(Parameters.Platform, ERHIFeatureLevel::SM5);
+	}
+};
+
 /**
  * Translucency Composite pixel shader.
  * Composites smoke OVER SeparateTranslucency (smoke on top of particles).
@@ -243,20 +287,24 @@ public:
 	SHADER_USE_PARAMETER_STRUCT(FIVSmokeTranslucencyCompositePS, FGlobalShader);
 
 	BEGIN_SHADER_PARAMETER_STRUCT(FParameters, )
-		/** Smoke albedo (color) from ray marching. */
-		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, SmokeAlbedoTex)
-		/** Smoke opacity mask from ray marching. */
-		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, SmokeMaskTex)
+		/** Smoke visual texture from SmokeVisualPass. */
+		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, SmokeVisualTex)
+		/** Smoke (LocalPos, Alpha) from ray marching. */
+		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, SmokeLocalPosAlphaTex)
 		/** SeparateTranslucency texture (particles). */
-		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, ParticlesTex)
+		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, ParticleSceneTex)
 		/** Linear sampler for texture filtering. */
-		SHADER_PARAMETER_SAMPLER(SamplerState, LinearSampler)
-		/** Sharpen/blur amount (-1 to 1, 0 = no filter). */
-		SHADER_PARAMETER(float, Sharpness)
-		/** Smoke texture extent for UV calculation. */
-		SHADER_PARAMETER(FVector2f, SmokeTexExtent)
+		SHADER_PARAMETER_SAMPLER(SamplerState, LinearClamp_Sampler)
 		/** Particles texture extent for UV calculation. */
 		SHADER_PARAMETER(FVector2f, ParticlesTexExtent)
+		/** Viewport size for UV calculation. */
+		SHADER_PARAMETER(FVector2f, ViewportSize)
+		/** View rect offset for multi-view support. */
+		SHADER_PARAMETER(FVector2f, ViewRectMin)
+		/** Alpha processing type in composite pass. */
+		SHADER_PARAMETER(int, AlphaType)
+		/** Minimum alpha threshold for rendering. Pixels with alpha below this value will be discarded. Only used when VisualAlphaType is CutOff. */
+		SHADER_PARAMETER(float, AlphaThreshold)
 		RENDER_TARGET_BINDING_SLOTS()
 	END_SHADER_PARAMETER_STRUCT()
 
@@ -285,10 +333,12 @@ public:
 	SHADER_USE_PARAMETER_STRUCT(FIVSmokeDepthSortedCompositePS, FGlobalShader);
 
 	BEGIN_SHADER_PARAMETER_STRUCT(FParameters, )
-		/** Smoke albedo (color) from ray marching CS. */
-		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, SmokeAlbedoTex)
-		/** Smoke opacity mask from ray marching CS. */
-		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, SmokeMaskTex)
+		/** Smoke visual texture from SmokeVisualPass. */
+		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, SmokeVisualTex)
+		/** Smoke (LocalPos, Alpha) from ray marching. */
+		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, SmokeLocalPosAlphaTex)
+		/** Smoke (WorldPos, Depth) from ray marching. */
+		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, SmokeWorldPosDepthTex)
 
 		/** SeparateTranslucency texture (particles). */
 		SHADER_PARAMETER_RDG_TEXTURE(Texture2D, SeparateTranslucencyTex)
@@ -301,13 +351,16 @@ public:
 		/** Linear sampler with clamp addressing. */
 		SHADER_PARAMETER_SAMPLER(SamplerState, LinearClamp_Sampler)
 
-		/** Smoke texture extent for UV calculation. */
-		SHADER_PARAMETER(FVector2f, SmokeTexExtent)
-		/** Sharpen/blur amount (-1 to 1, 0 = no filter). */
-		SHADER_PARAMETER(float, Sharpness)
+		/** Viewport size for UV calculation. */
+		SHADER_PARAMETER(FVector2f, ViewportSize)
+		/** View rect offset for multi-view support. */
+		SHADER_PARAMETER(FVector2f, ViewRectMin)
 		/** Transform for converting device Z to world Z. */
 		SHADER_PARAMETER(FVector4f, InvDeviceZToWorldZTransform)
-
+		/** Alpha processing type in composite pass. */
+		SHADER_PARAMETER(int, AlphaType)
+		/** Minimum alpha threshold for rendering. Pixels with alpha below this value will be discarded. Only used when VisualAlphaType is CutOff. */
+		SHADER_PARAMETER(float, AlphaThreshold)
 		RENDER_TARGET_BINDING_SLOTS()
 	END_SHADER_PARAMETER_STRUCT()
 

@@ -7,6 +7,8 @@
 #include "PostProcess/PostProcessMaterialInputs.h"
 #include "ScreenPass.h"
 #include "RenderingThread.h"
+#include "EngineUtils.h"
+#include "GameFramework/GameStateBase.h"
 
 TSharedPtr<FIVSmokeSceneViewExtension, ESPMode::ThreadSafe> FIVSmokeSceneViewExtension::Instance;
 
@@ -34,33 +36,61 @@ void FIVSmokeSceneViewExtension::BeginRenderViewFamily(FSceneViewFamily& InViewF
 	// This ensures render data is prepared exactly once per frame
 	FIVSmokeRenderer& Renderer = FIVSmokeRenderer::Get();
 
-	// Skip if no volumes
-	if (!Renderer.HasVolumes())
+	// Get world from ViewFamily
+	UWorld* World = nullptr;
+	if (InViewFamily.Scene)
+	{
+		World = InViewFamily.Scene->GetWorld();
+	}
+
+	if (!World)
 	{
 		return;
 	}
 
-	// Collect valid volumes under lock
-	TArray<AIVSmokeVoxelVolume*> ValidVolumes;
+	// Sync server time if needed
+	if (!Renderer.bIsServerTimeSynced())
 	{
-		FScopeLock Lock(&Renderer.GetVolumesMutex());
-		for (const auto& WeakVolume : Renderer.GetVolumes())
+		if (AGameStateBase* GS = World->GetGameState())
 		{
-			if (AIVSmokeVoxelVolume* Volume = WeakVolume.Get())
-			{
-				ValidVolumes.Add(Volume);
-			}
+			float LocalTime = World->GetTimeSeconds();
+			float ServerTime = GS->GetServerWorldTimeSeconds();
+			Renderer.SetServerTimeOffset(ServerTime - LocalTime);
+		}
+	}
+
+	// Collect renderable volumes using TActorIterator (Pull-based pattern)
+	TArray<AIVSmokeVoxelVolume*> ValidVolumes;
+	for (TActorIterator<AIVSmokeVoxelVolume> It(World); It; ++It)
+	{
+		if (It->ShouldRender())
+		{
+			ValidVolumes.Add(*It);
 		}
 	}
 
 	if (ValidVolumes.Num() == 0)
 	{
+		// Clear cached render data to stop rendering
+		ENQUEUE_RENDER_COMMAND(IVSmokeClearRenderData)(
+			[&Renderer](FRHICommandListImmediate& RHICmdList)
+			{
+				Renderer.SetCachedRenderData(FIVSmokePackedRenderData());
+			}
+		);
 		return;
 	}
 
-	// Prepare render data on Game Thread (all Volume data access happens here)
-	FIVSmokePackedRenderData RenderData = Renderer.PrepareRenderData(ValidVolumes);
+	// Get camera position from first view for distance-based filtering
+	FVector CameraPosition = FVector::ZeroVector;
+	if (InViewFamily.Views.Num() > 0 && InViewFamily.Views[0])
+	{
+		CameraPosition = InViewFamily.Views[0]->ViewLocation;
+	}
 
+	// Prepare render data on Game Thread (all Volume data access happens here)
+	FIVSmokePackedRenderData RenderData = Renderer.PrepareRenderData(ValidVolumes, CameraPosition);
+	
 	// Transfer to Render Thread via command queue
 	ENQUEUE_RENDER_COMMAND(IVSmokeSetRenderData)(
 		[&Renderer, RenderData = MoveTemp(RenderData)](FRHICommandListImmediate& RHICmdList) mutable
@@ -72,7 +102,9 @@ void FIVSmokeSceneViewExtension::BeginRenderViewFamily(FSceneViewFamily& InViewF
 
 bool FIVSmokeSceneViewExtension::IsActiveThisFrame_Internal(const FSceneViewExtensionContext& Context) const
 {
-	return FIVSmokeRenderer::Get().HasVolumes();
+	// Always active - actual filtering happens in BeginRenderViewFamily via TActorIterator
+	// This is intentional: the cost of iterating 128 volumes per frame is negligible (~1μs)
+	return true;
 }
 
 void FIVSmokeSceneViewExtension::SubscribeToPostProcessingPass(

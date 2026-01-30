@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "ScreenPass.h"
 #include "IVSmokeShaders.h"
+#include "IVSmokeSettings.h"
+#include "IVSmokeVisualMaterialPreset.h"
 
 class AIVSmokeVoxelVolume;
 class FRDGBuilder;
@@ -15,6 +17,27 @@ struct FPostProcessMaterialInputs;
 class FIVSmokeCSMRenderer;
 class FIVSmokeVSMProcessor;
 struct FIVSmokeOccupancyResources;
+
+//~==============================================================================
+// Internal Noise Generation Constants
+
+/**
+ * Internal noise generation configuration.
+ * These values are tuned for optimal smoke appearance and should not be exposed to users.
+ */
+struct FIVSmokeNoiseConfig
+{
+	static constexpr int32 Seed = 0;
+	static constexpr int32 TexSize = 128;
+	static constexpr int32 Octaves = 6;
+	static constexpr float Wrap = 0.76f;
+	static constexpr float Amplitude = 0.62f;
+	static constexpr int32 AxisCellCount = 4;
+	static constexpr int32 CellSize = 32;
+
+	/** UV multiplier for noise sampling. Fixed at 1.0; use SmokeSize to control detail frequency. */
+	static constexpr float NoiseUVMul = 1.0f;
+};
 
 //~==============================================================================
 // Render Data Structures (Thread-Safe Data Transfer)
@@ -97,6 +120,12 @@ struct IVSMOKE_API FIVSmokePackedRenderData
 	/** Game World Time */
 	float GameTime = 0.0f;
 
+	/** Rendering Info */
+	UMaterialInterface* SmokeVisualMaterial = nullptr;
+	EIVSmokeVisualAlphaType VisualAlphaType = EIVSmokeVisualAlphaType::Alpha;
+	float AlphaThreshold = 0.0f;
+	float LowOpacityRemapThreshold = 0.02f;
+
 	/** Reset to invalid state */
 	void Reset()
 	{
@@ -116,6 +145,8 @@ struct IVSMOKE_API FIVSmokePackedRenderData
 		CSMSplitDistances.Empty();
 		CSMLightCameraPositions.Empty();
 		CSMLightCameraForwards.Empty();
+
+		SmokeVisualMaterial = nullptr;
 	}
 };
 
@@ -140,36 +171,29 @@ public:
 	/** Check if renderer is initialized with valid resources. */
 	bool IsInitialized() const { return NoiseVolume != nullptr; }
 
-	//~==============================================================================
-	// Volume Management
+	/** Check if server time offset was set. */
+	bool bIsServerTimeSynced() const { return bServerTimeSynced; }
 
-	/** Register a smoke volume for rendering. */
-	void AddVolume(AIVSmokeVoxelVolume* Volume);
-
-	/** Unregister a smoke volume from rendering. */
-	void RemoveVolume(AIVSmokeVoxelVolume* Volume);
-
-	/** Check if any volumes are registered for rendering. */
-	bool HasVolumes() const;
-
-	/** Access to volumes array (for PrepareRenderData). */
-	const TArray<TWeakObjectPtr<AIVSmokeVoxelVolume>>& GetVolumes() const { return Volumes; }
-
-	/** Access to volumes mutex (for thread-safe iteration). */
-	FCriticalSection& GetVolumesMutex() const { return VolumesMutex; }
+	/** SetServerTimeOffset for smoke wind animation. */
+	void SetServerTimeOffset(const float InServerTimeOffset) { bServerTimeSynced = true;  ServerTimeOffset = InServerTimeOffset; }
 
 	//~==============================================================================
 	// Thread-Safe Render Data (Game Thread Render Thread)
+
+	/** Maximum number of volumes supported for rendering. */
+	static constexpr int32 MaxSupportedVolumes = 128;
 
 	/**
 	 * Prepare render data from all registered volumes.
 	 * Must be called on Game Thread.
 	 * Copies and packs all volume data for safe Render Thread access.
+	 * If volume count exceeds MaxSupportedVolumes (128), filters by distance from camera.
 	 *
 	 * @param InVolumes Array of volumes to process
+	 * @param CameraPosition Camera world position for distance-based filtering
 	 * @return Packed render data ready for Render Thread
 	 */
-	FIVSmokePackedRenderData PrepareRenderData(const TArray<AIVSmokeVoxelVolume*>& InVolumes);
+	FIVSmokePackedRenderData PrepareRenderData(const TArray<AIVSmokeVoxelVolume*>& InVolumes, const FVector& CameraPosition);
 
 	/**
 	 * Set cached render data for next frame.
@@ -202,7 +226,7 @@ private:
 	FIVSmokeRenderer();   // Defined in cpp for TUniquePtr with forward-declared types
 	~FIVSmokeRenderer();
 
-	FIntVector GetAtlasTexCount(const FIntVector& TexSize, const int32 TexCount, const int32 TexturePackInterval, const int32 TexturePackMaxSize);
+	FIntVector GetAtlasTexCount(const FIntVector& TexSize, const int32 TexCount, const int32 TexturePackInterval, const int32 TexturePackMaxSize) const;
 	//~==============================================================================
 	// Resource Management
 
@@ -240,34 +264,11 @@ private:
 		const FSceneView& View,
 		const FIVSmokePackedRenderData& RenderData,
 		FRDGTextureRef SmokeAlbedoTex,
-		FRDGTextureRef SmokeMaskTex,
+		FRDGTextureRef SmokeLocalPosAlpha,
+		FRDGTextureRef SmokeWorldPosDepth,
 		const FIntPoint& TexSize,
 		const FIntPoint& ViewportSize,
 		const FIntPoint& ViewRectMin
-	);
-
-	/**
-	 * Sharpen Composite PS Pass.
-	 * Blends ray marching result (Dual RT) with scene color and applies sharpening/blurring.
-	 *
-	 * @param GraphBuilder       RDG builder
-	 * @param View               Current scene view
-	 * @param SceneTex           Scene color texture
-	 * @param SmokeAlbedoTex     Smoke color texture from ray marching
-	 * @param SmokeMaskTex       Smoke opacity mask from ray marching
-	 * @param Output             Final render target
-	 * @param ViewportSize       Size of the viewport for UV calculation
-	 * @param Sharpness          Sharpen/blur amount (-1 to 1, 0 = no filter)
-	 */
-	void AddSharpenCompositePass(
-		FRDGBuilder& GraphBuilder,
-		const FSceneView& View,
-		FRDGTextureRef SceneTex,
-		FRDGTextureRef SmokeAlbedoTex,
-		FRDGTextureRef SmokeMaskTex,
-		const FScreenPassRenderTarget& Output,
-		const FIntPoint& ViewportSize,
-		float Sharpness
 	);
 
 	/**
@@ -306,71 +307,125 @@ private:
 	);
 
 	/**
+	 * Filtering pass after upsampling.
+	 *
+	 * @param GraphBuilder			RDG builder
+	 * @param RenderData			RenderData ref
+	 * @param View					Current scene view
+	 * @param SceneTex				SceneColor texture
+	 * @param SmokeAlbedo			SmokeAlbedo texture from ray marching
+	 * @param SmokeLocalPosAlpha	Smoke (local position, alpha) texture from ray marching
+	 * @param TexSize				Output texture size
+	 */
+	FRDGTextureRef AddUpsampleFilterPass(FRDGBuilder& GraphBuilder, const FIVSmokePackedRenderData& RenderData, const FSceneView& View,
+		FRDGTextureRef SceneTex, FRDGTextureRef SmokeAlbedo, FRDGTextureRef SmokeLocalPosAlpha, const FIntPoint& TexSize);
+
+	/**
+	 * Visual pass after Upsample Filtering.
+	 *
+	 * @param GraphBuilder				RDG builder
+	 * @param RenderData				RenderData ref
+	 * @param View						Current scene view
+	 * @param SmokeTex					Smoke texture after SmokeVisual pass
+	 * @param SmokeLocalPosAlphaTex		Smoke (local position, alpha) texture from ray marching
+	 * @param SmokeWorldPosDepthTex		Smoke (world position, linear depth) texture from ray marching
+	 * @param SceneTex,					Scene texture
+	 * @param TexSize					Output texture size
+	 */
+	FRDGTextureRef AddSmokeVisualPass(FRDGBuilder& GraphBuilder, const FIVSmokePackedRenderData& RenderData, const FSceneView& View, FRDGTextureRef SmokeTex, FRDGTextureRef SmokeLocalPosAlphaTex, FRDGTextureRef SmokeWorldPosDepthTex, FRDGTextureRef SceneTex, const FIntPoint& TexSize);
+
+	/**
+	 * Composite PS Pass.
+	 * Blends ray marching result (Dual RT) with scene color and applies sharpening/blurring.
+	 *
+	 * @param GraphBuilder				RDG builder
+	 * @param RenderData				RenderData ref
+	 * @param View						Current scene view
+	 * @param SceneTex					Scene color texture
+	 * @param SmokeVisualTex			Smoke texture after smoke visual pass
+	 * @param SmokeLocalPosAlphaTex		Smoke (local position, alpha) texture from ray marching
+	 * @param Output					Final render target
+	 * @param ViewportSize				Size of the viewport for UV calculation
+	 */
+	void AddCompositePass(
+		FRDGBuilder& GraphBuilder,
+		const FIVSmokePackedRenderData& RenderData,
+		const FSceneView& View,
+		FRDGTextureRef SceneTex,
+		FRDGTextureRef SmokeVisualTex,
+		FRDGTextureRef SmokeLocalPosAlphaTex,
+		const FScreenPassRenderTarget& Output,
+		const FIntPoint& ViewportSize);
+
+	/**
 	 * Translucency Composite PS Pass.
 	 * Composites smoke OVER particles for TranslucencyAfterDOF mode.
 	 * Engine will composite result with SceneColor using alpha as transmittance.
 	 *
-	 * @param GraphBuilder       RDG builder
-	 * @param View               Current scene view
-	 * @param SmokeAlbedoTex     Smoke color texture from ray marching
-	 * @param SmokeMaskTex       Smoke opacity mask from ray marching
-	 * @param ParticlesTex       SeparateTranslucency texture (particles)
-	 * @param Output             Final render target
-	 * @param SmokeTexExtent     Smoke texture extent (= ViewportSize)
-	 * @param ParticlesTexExtent Particles texture extent
-	 * @param Sharpness          Sharpen/blur amount (-1 to 1, 0 = no filter)
+	 * @param GraphBuilder				RDG builder
+	 * @param RenderData				RenderData ref
+	 * @param View						Current scene view
+	 * @param SmokeVisualTex			Smoke texture after smoke visual pass
+	 * @param SmokeLocalPosAlphaTex		Smoke (local position, alpha) texture from ray marching
+	 * @param ParticlesTex				SeparateTranslucency texture (particles)
+	 * @param Output					Final render target
+	 * @param ParticlesTexExtent		Particles texture extent
+	 * @param ViewportSize				Size of the viewport for UV calculation
 	 */
 	void AddTranslucencyCompositePass(
 		FRDGBuilder& GraphBuilder,
+		const FIVSmokePackedRenderData& RenderData,
 		const FSceneView& View,
-		FRDGTextureRef SmokeAlbedoTex,
-		FRDGTextureRef SmokeMaskTex,
+		FRDGTextureRef SmokeVisualTex,
+		FRDGTextureRef SmokeLocalPosAlphaTex,
 		FRDGTextureRef ParticlesTex,
 		const FScreenPassRenderTarget& Output,
-		const FIntPoint& SmokeTexExtent,
 		const FIntPoint& ParticlesTexExtent,
-		float Sharpness
-	);
+		const FIntPoint& ViewportSize);
 
 	/**
 	 * Depth-Sorted Composite PS Pass.
 	 * Compares Z values to determine front/back ordering, then applies standard over blending.
 	 * Accesses CustomDepth and SceneDepth via SceneTexturesStruct uniform buffer.
 	 *
-	 * @param GraphBuilder            RDG builder
-	 * @param View                    Current scene view
-	 * @param SmokeAlbedoTex          Smoke color texture from ray marching
-	 * @param SmokeMaskTex            Smoke opacity mask from ray marching
-	 * @param SeparateTranslucencyTex Particle layer from SeparateTranslucency
-	 * @param Output                  Final render target
-	 * @param SmokeTexExtent          Smoke texture extent (= ViewportSize)
-	 * @param Sharpness               Sharpen/blur amount (-1 to 1, 0 = no filter)
+	 * @param GraphBuilder				RDG builder
+	 * @param RenderData				RenderData ref
+	 * @param View						Current scene view
+	 * @param SmokeVisualTex			Smoke texture after smoke visual pass
+	 * @param SmokeLocalPosAlphaTex		Smoke (local position, alpha) texture from ray marching
+	 * @param SmokeWorldPosDepthTex		Smoke (world position, linear depth) texture from ray marching
+	 * @param SeparateTranslucencyTex	Particle layer from SeparateTranslucency
+	 * @param Output					Final render target
+	 * @param ViewportSize				Size of the viewport for UV calculation
 	 */
 	void AddDepthSortedCompositePass(
 		FRDGBuilder& GraphBuilder,
+		const FIVSmokePackedRenderData& RenderData,
 		const FSceneView& View,
-		FRDGTextureRef SmokeAlbedoTex,
-		FRDGTextureRef SmokeMaskTex,
+		FRDGTextureRef SmokeVisualTex,
+		FRDGTextureRef SmokeLocalPosAlphaTex,
+		FRDGTextureRef SmokeWorldPosDepthTex,
 		FRDGTextureRef SeparateTranslucencyTex,
 		const FScreenPassRenderTarget& Output,
-		const FIntPoint& SmokeTexExtent,
-		float Sharpness
-	);
+		const FIntPoint& ViewportSize);
 
 	//~==============================================================================
 	// State
 
-	TArray<TWeakObjectPtr<AIVSmokeVoxelVolume>> Volumes;
-	mutable FCriticalSection VolumesMutex;
-
 	/** Shared noise volume texture for all smoke rendering. Prevent GC via AddToRoot. */
 	UTextureRenderTargetVolume* NoiseVolume = nullptr;
 
-	/** Elapsed time for animation. */
-	float ElapsedTime = 0.0f;
+	/** True if server time offset has been initialized (one-time sync completed). */
+	bool bServerTimeSynced = false;
+
+	/** ServerTime offset for animation. (ServerTime = LocalTime + Offset) */
+	float ServerTimeOffset = 0.0f;
 
 	//~==============================================================================
 	// External Shadowing (CSM - Cascaded Shadow Maps)
+
+	/** Last world used for rendering. Used to detect world changes (Editor ↔ PIE). */
+	TWeakObjectPtr<UWorld> LastRenderedWorld;
 
 	/** CSM renderer (manages all cascade captures). */
 	TUniquePtr<FIVSmokeCSMRenderer> CSMRenderer;
@@ -413,4 +468,29 @@ private:
 
 	/** Mutex for thread-safe access to CachedRenderData. */
 	mutable FCriticalSection RenderDataMutex;
+
+	//~==============================================================================
+	// Stats Tracking
+
+	/** Last time stats were updated (for 1-second interval). */
+	double LastStatUpdateTime = 0.0;
+
+	/** Cached memory sizes for stat reporting. */
+	int64 CachedNoiseVolumeSize = 0;
+	int64 CachedCSMSize = 0;
+	int64 CachedPerFrameSize = 0;
+
+	/** Update stats if 1 second has passed since last update. */
+	void UpdateStatsIfNeeded(const FIVSmokePackedRenderData& RenderData, const FIntPoint& ViewportSize);
+
+	/** Calculate per-frame texture memory usage. */
+	int64 CalculatePerFrameTextureSize(
+		const FIntPoint& ViewportSize,
+		int32 VolumeCount,
+		const FIntVector& VoxelResolution,
+		const FIntVector& HoleResolution
+	) const;
+
+	/** Update all stat values. */
+	void UpdateAllStats();
 };

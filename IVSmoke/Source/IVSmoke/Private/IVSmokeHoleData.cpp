@@ -28,6 +28,12 @@ void FIVSmokeHoleData::PreReplicatedRemove(const FIVSmokeHoleArray& InArray)
 	}
 }
 
+void FIVSmokeHoleArray::Empty()
+{
+	Items.Empty();
+	MarkArrayDirty();
+}
+
 TArray<FIVSmokeHoleGPU> FIVSmokeHoleArray::GetHoleGPUData(const float CurrentServerTime) const
 {
 	TArray<FIVSmokeHoleGPU> GPUBuffer;
@@ -103,12 +109,10 @@ FIVSmokeHoleGPU::FIVSmokeHoleGPU(const FIVSmokeHoleData& DynamicHoleData, const 
 		float ExpansionNormalizedTime = FMath::Clamp(CurLifeTime / Preset.ExpansionDuration, 0.0f, 1.0f);
 		float ShrinkNormalizedTime = FMath::Clamp((CurLifeTime - Preset.ExpansionDuration) / (Preset.Duration - Preset.ExpansionDuration), 0.0f, 1.0f);
 
-		CurExpansionFadeRangeOverTime = UIVSmokeHolePreset::GetFloatValue(Preset.ExpansionFadeRangeCurveOverTime, ExpansionNormalizedTime);
-		CurShrinkFadeRangeOverTime = UIVSmokeHolePreset::GetFloatValue(Preset.ShrinkFadeRangeCurveOverTime, ShrinkNormalizedTime);
-		CurShrinkDensityMulOverTime = UIVSmokeHolePreset::GetFloatValue(Preset.ShrinkDensityMulCurveOverTime, ShrinkNormalizedTime);
-		CurDistortionOverTime = UIVSmokeHolePreset::GetFloatValue(Preset.DistortionCurveOverTime, ExpansionNormalizedTime);
+		CurExpansionFadeRangeOverTime = Preset.ExpansionFadeRangeCurveOverTime ? UIVSmokeHolePreset::GetFloatValue(Preset.ExpansionFadeRangeCurveOverTime, ExpansionNormalizedTime) : ExpansionNormalizedTime;
+		CurShrinkFadeRangeOverTime = Preset.ShrinkFadeRangeCurveOverTime ? UIVSmokeHolePreset::GetFloatValue(Preset.ShrinkFadeRangeCurveOverTime, ShrinkNormalizedTime) : 1 - ShrinkNormalizedTime;
+		DistortionExpOverTime = Preset.DistortionExpOverTime;
 		DistortionDistance = Preset.DistortionDistance;
-		UIVSmokeHolePreset::GetCurveSamples(Preset.DistortionCurveOverDistance.Get(), FIVSmokeHoleCarveCS::CurveSampleCount, DistortionCurveOverDistance);
 		break;
 	}
 	case EIVSmokeHoleType::Penetration:
