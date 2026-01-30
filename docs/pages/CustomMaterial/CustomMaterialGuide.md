@@ -8,7 +8,7 @@
 
 - Material Domain : PostProcess
 
-![image.png](image%201.png)
+![image.png](image1.png)
 
 - **SmokeTexture**: Create a **SceneTexture** node → Scene Texture ID: **[PostProcessInput0]**
 - **SmokeLocalPosAlphaTexture (LocalPos(x,y,z), Alpha)**: Create a **SceneTexture** node → Scene Texture ID: **[PostProcessInput1]**
@@ -17,11 +17,15 @@
 
 ---
 
-## ProjectSetting Rendering
+## Visual Material Preset
 
-![image.png](image%202.png)
+### Create
+![image.png](IVSmoke_DataAsset.png)
+![image.png](IVSmoke_DataAsset_VisualMaterialPreset.png)
 
-- **Render Pass**: Information about render order (not covered in detail on this page)
+### Configuration
+![image.png](image2.png)
+
 - **Smoke Visual Material**: User-custom smoke material slot
     - If empty, the system returns **SmokeTexture** as-is
 - **Visual Alpha Type**: Defines how the smoke alpha is processed
@@ -36,14 +40,18 @@ if (SmokeAlpha < LowOpacityRemapThreshold)
 	SmokeAlpha = max(0.0, (SmokeMask - LowOpacityRemapThreshold * 0.5f) * 2.0);
 }
 ```
-
+---
+## Project Setting Visual Material Preset
+![image.png](IVSmoke_ProjectSetting_VisualMaterialPreset.png)
+- **Search project setting for IVSmoke**
+- **In the Rendering section, insert it into the Smoke Visual Material Preset slot.**
 ---
 
 ## Example
 
-**Demo Material Path** : Plugins → IVSmoke → Materials → M_IVSmoke_BasicVisual
+**Demo Material Path** : Plugins → IVSmoke → DataAssets → D_IVSmoke_VisualMaterialPreset
 
-![image.png](image%203.png)
+![image.png](image3.png)
 
 [IVSmoke_Option_Material.mp4](IVSmoke_Option_Material.mp4)
 
