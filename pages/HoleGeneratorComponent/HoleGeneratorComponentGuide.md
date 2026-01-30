@@ -2,7 +2,7 @@
 
 ## Explosion (Grenade)
 
-![image.png](image.png)
+![HoleGeneratorComponent_image.png](HoleGeneratorComponent_image.png)
 
 - **HoleType**: Type of hole
 - **Radius**: Hole size
@@ -22,7 +22,7 @@
 
 ## Penetration (Bullet)
 
-![image1.png](image1.png)
+![HoleGeneratorComponent_image1.png](HoleGeneratorComponent_image1.png)
 
 - **HoleType**: Type of hole
 - **Radius**: Hole size at the initial collision point with the smoke
@@ -36,7 +36,7 @@
 
 ---
 
-![image2.png](image2.png)
+![HoleGeneratorComponent_image2.png](HoleGeneratorComponent_image2.png)
 
 Demo preset path : Plugins → IVSmoke → DataAssets
 
@@ -46,15 +46,15 @@ Demo preset path : Plugins → IVSmoke → DataAssets
 
 Content Drawer → Right-click → Miscellaneous → Data Asset → Select [IVSmoke Hole Preset]
 
-![image3.png](image%3.png)
+![HoleGeneratorComponent_image3.png](HoleGeneratorComponent_image3.png)
 
-![image4.png](image4.png)
+![HoleGeneratorComponent_image4.png](HoleGeneratorComponent_image4.png)
 
 ---
 
 ## Usage
 
-![image5.png](image5.png)
+![HoleGeneratorComponent_image5.png](HoleGeneratorComponent_image5.png)
 
 ### **Selecting the Right Interaction Node**
 
@@ -66,7 +66,7 @@ Content Drawer → Right-click → Miscellaneous → Data Asset → Select [IVSm
 
 ### Before. Add UIVSmokeHoleRequestComponent
 
-![image6.png](image6.png)
+![HoleGeneratorComponent_image6.png](HoleGeneratorComponent_image6.png)
 
 Before utilizing any Request Nodes, ensure that the **`UIVSmokeHoleRequestComponent`** has been added to the subject Character or Pawn class actor.
 
@@ -75,7 +75,7 @@ Before utilizing any Request Nodes, ensure that the **`UIVSmokeHoleRequestCompon
 
 ### Case A. Request Penetration Hole
 
-![image7.png](image7.png)
+![HoleGeneratorComponent_image7.png](HoleGeneratorComponent_image7.png)
 
 This node is used to simulate the trajectories of high-speed projectiles that pierce through smoke in a straight line, such as bullets or railgun rounds.
 
@@ -93,7 +93,7 @@ Trigger this node when physical detection is confirmed—specifically during eve
 
 ### Case B. Request Explosion Hole
 
-![image8.png](image8.png)
+![HoleGeneratorComponent_image8.png](HoleGeneratorComponent_image8.png)
 
 This node is used to simulate **spherical (radial) void areas** in smoke, typically caused by explosive devices like grenades, C4, or artillery shells.
 
@@ -110,7 +110,7 @@ Trigger this node at the moment the explosion is finalized. This is usually duri
 
 ### Case C. Request Dynamic Hole
 
-![image9.png](image9.png)
+![HoleGeneratorComponent_image9.png](HoleGeneratorComponent_image9.png)
 
 Use this node when you need to **dynamically clear smoke or maintain a hole in real-time** based on the movement path of an object, such as a character or a vehicle.
 
