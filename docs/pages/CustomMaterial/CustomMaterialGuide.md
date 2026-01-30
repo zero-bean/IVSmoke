@@ -20,6 +20,8 @@
 ## Visual Material Preset
 
 ### Create
+Content Drawer → Right-click → Miscellaneous → Data Asset → Select [IVSmoke Visual Material Preset]
+
 ![image.png](IVSmoke_DataAsset.png)
 ![image.png](IVSmoke_DataAsset_VisualMaterialPreset.png)
 
