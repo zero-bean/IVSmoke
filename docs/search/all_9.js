@@ -21,13 +21,13 @@ var searchData=
   ['dissipationnoise_18',['DissipationNoise',['../class_a_i_v_smoke_voxel_volume.html#ad80330806a2b12bc75565574421e1dd6',1,'AIVSmokeVoxelVolume']]],
   ['dissipationstarttime_19',['DissipationStartTime',['../struct_f_i_v_smoke_server_state.html#a0a93113505d1abec448fef46df5f5916',1,'FIVSmokeServerState']]],
   ['distancethreshold_20',['DistanceThreshold',['../class_u_i_v_smoke_hole_preset.html#a50d94a7edf240aac96aaec0294c1d4fb',1,'UIVSmokeHolePreset']]],
-  ['distortioncurveoverdistance_21',['DistortionCurveOverDistance',['../struct_f_i_v_smoke_hole_g_p_u.html#a9f307df502e6cdf6614fe0516054bc4d',1,'FIVSmokeHoleGPU::DistortionCurveOverDistance'],['../class_u_i_v_smoke_hole_preset.html#a99cfe623120eda040ed1324dc31d33e8',1,'UIVSmokeHolePreset::DistortionCurveOverDistance']]],
-  ['distortioncurveovertime_22',['DistortionCurveOverTime',['../class_u_i_v_smoke_hole_preset.html#ab10c50d4d7ffd9392da54f01b5b1d6cf',1,'UIVSmokeHolePreset']]],
-  ['distortiondistance_23',['DistortionDistance',['../struct_f_i_v_smoke_hole_g_p_u.html#a10f5b7cee433e92e55686c953963bd53',1,'FIVSmokeHoleGPU::DistortionDistance'],['../class_u_i_v_smoke_hole_preset.html#a8865ba3a05ee41731e0d7a4da4e6ee85',1,'UIVSmokeHolePreset::DistortionDistance']]],
-  ['distribution_24',['Spacing and Distribution',['../md_pages_2_global_settings_2_global_settings_guide.html#autotoc_md115',1,'']]],
-  ['documentation_20roadmap_25',['3. Documentation Roadmap',['../index.html#autotoc_md15',1,'']]],
-  ['does_20not_20create_20a_20collision_20box_20for_20every_20single_20voxel_20instead_20it_20utilizes_20a_20binary_20greedy_20meshing_20algorithm_26',['How It Works: Greedy Meshing To maintain high performance, the component &lt;b&gt;does not&lt;/b&gt; create a collision box for every single voxel. Instead, it utilizes a &lt;b&gt;Binary Greedy Meshing&lt;/b&gt; algorithm.',['../md_pages_2_collision_component_2_collision_component_guide.html#autotoc_md26',1,'']]],
-  ['drawdebugvisualization_27',['DrawDebugVisualization',['../class_u_i_v_smoke_collision_component.html#a3b5e0bebd069996cea81e245f63799c7',1,'UIVSmokeCollisionComponent']]],
-  ['duration_28',['Duration',['../struct_f_i_v_smoke_hole_g_p_u.html#a645208cb2ccc34402b8d82997d07a5b6',1,'FIVSmokeHoleGPU::Duration'],['../class_u_i_v_smoke_hole_preset.html#aa18b922ee7aeba5183dd418ff071d248',1,'UIVSmokeHolePreset::Duration']]],
-  ['dynamic_20hole_29',['Case C. Request Dynamic Hole',['../md_pages_2_hole_generator_component_2_hole_generator_component_guide.html#autotoc_md134',1,'']]]
+  ['distortiondistance_21',['DistortionDistance',['../class_u_i_v_smoke_hole_preset.html#a8865ba3a05ee41731e0d7a4da4e6ee85',1,'UIVSmokeHolePreset::DistortionDistance'],['../struct_f_i_v_smoke_hole_g_p_u.html#a10f5b7cee433e92e55686c953963bd53',1,'FIVSmokeHoleGPU::DistortionDistance']]],
+  ['distortionexpovertime_22',['DistortionExpOverTime',['../class_u_i_v_smoke_hole_preset.html#a4c1cc4228214fd0a11a9fd5ad5503053',1,'UIVSmokeHolePreset::DistortionExpOverTime'],['../struct_f_i_v_smoke_hole_g_p_u.html#a6737e71724cfecda4fe9916f21796358',1,'FIVSmokeHoleGPU::DistortionExpOverTime']]],
+  ['distribution_23',['Spacing and Distribution',['../md_pages_2_global_settings_2_global_settings_guide.html#autotoc_md115',1,'']]],
+  ['documentation_20roadmap_24',['3. Documentation Roadmap',['../index.html#autotoc_md15',1,'']]],
+  ['does_20not_20create_20a_20collision_20box_20for_20every_20single_20voxel_20instead_20it_20utilizes_20a_20binary_20greedy_20meshing_20algorithm_25',['How It Works: Greedy Meshing To maintain high performance, the component &lt;b&gt;does not&lt;/b&gt; create a collision box for every single voxel. Instead, it utilizes a &lt;b&gt;Binary Greedy Meshing&lt;/b&gt; algorithm.',['../md_pages_2_collision_component_2_collision_component_guide.html#autotoc_md26',1,'']]],
+  ['drawdebugvisualization_26',['DrawDebugVisualization',['../class_u_i_v_smoke_collision_component.html#a3b5e0bebd069996cea81e245f63799c7',1,'UIVSmokeCollisionComponent']]],
+  ['duration_27',['Duration',['../class_u_i_v_smoke_hole_preset.html#aa18b922ee7aeba5183dd418ff071d248',1,'UIVSmokeHolePreset::Duration'],['../struct_f_i_v_smoke_hole_g_p_u.html#a645208cb2ccc34402b8d82997d07a5b6',1,'FIVSmokeHoleGPU::Duration']]],
+  ['dynamic_20hole_28',['Case C. Request Dynamic Hole',['../md_pages_2_hole_generator_component_2_hole_generator_component_guide.html#autotoc_md134',1,'']]],
+  ['dynamicnoise_29',['DynamicNoise',['../class_u_i_v_smoke_hole_generator_component.html#a9b58795e1926f286460b6e99e4a07c14',1,'UIVSmokeHoleGeneratorComponent']]]
 ];

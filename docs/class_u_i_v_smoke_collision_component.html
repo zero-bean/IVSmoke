@@ -98,7 +98,7 @@ Inheritance diagram for UIVSmokeCollisionComponent:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_u_i_v_smoke_collision_component__inherit__graph.png" border="0" usemap="#a_u_i_v_smoke_collision_component_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
 <map name="a_u_i_v_smoke_collision_component_inherit__map" id="a_u_i_v_smoke_collision_component_inherit__map">
-<area shape="rect" title=" " alt="" coords="5,123,218,405"/>
+<area shape="rect" title=" " alt="" coords="5,123,218,363"/>
 <area shape="rect" title=" " alt="" coords="42,5,181,75"/>
 <area shape="poly" title=" " alt="" coords="112,87,114,123,109,122,111,92"/>
 </map>
@@ -108,7 +108,7 @@ Collaboration diagram for UIVSmokeCollisionComponent:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_u_i_v_smoke_collision_component__coll__graph.png" border="0" usemap="#a_u_i_v_smoke_collision_component_coll__map" loading="lazy" alt="Collaboration graph"/></div>
 <map name="a_u_i_v_smoke_collision_component_coll__map" id="a_u_i_v_smoke_collision_component_coll__map">
-<area shape="rect" title=" " alt="" coords="5,123,218,405"/>
+<area shape="rect" title=" " alt="" coords="5,123,218,363"/>
 <area shape="rect" title=" " alt="" coords="42,5,181,75"/>
 <area shape="poly" title=" " alt="" coords="112,87,114,123,109,122,111,92"/>
 </map>
@@ -124,8 +124,6 @@ Public Member Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a0f4d27f0dac91f6e5f03d4e7ed7f9683" id="r_a0f4d27f0dac91f6e5f03d4e7ed7f9683"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a0f4d27f0dac91f6e5f03d4e7ed7f9683">bCollisionEnabled</a> = true</td></tr>
-<tr class="memitem:aa8a21fae21363b9f586ccd330c7ad925" id="r_aa8a21fae21363b9f586ccd330c7ad925"><td class="memItemLeft">FName&#160;</td><td class="memItemRight"><a class="el" href="#aa8a21fae21363b9f586ccd330c7ad925">SmokeCollisionProfileName</a> = UCollisionProfile::NoCollision_ProfileName</td></tr>
-<tr class="memitem:ac2b852d08ae56978c940d13599c282dc" id="r_ac2b852d08ae56978c940d13599c282dc"><td class="memItemLeft">TArray&lt; TEnumAsByte&lt; ECollisionChannel &gt; &gt;&#160;</td><td class="memItemRight"><a class="el" href="#ac2b852d08ae56978c940d13599c282dc">BlockChannelArray</a></td></tr>
 <tr class="memitem:a65f83b67c0f01e7433c34e5c336747c5" id="r_a65f83b67c0f01e7433c34e5c336747c5"><td class="memItemLeft">int32&#160;</td><td class="memItemRight"><a class="el" href="#a65f83b67c0f01e7433c34e5c336747c5">MinCollisionUpdateVoxelNum</a> = 50</td></tr>
 <tr class="memitem:a59d22fb7acf6ed4a216250b8effc233d" id="r_a59d22fb7acf6ed4a216250b8effc233d"><td class="memItemLeft">float&#160;</td><td class="memItemRight"><a class="el" href="#a59d22fb7acf6ed4a216250b8effc233d">MinCollisionUpdateInterval</a> = 0.25f</td></tr>
 <tr class="memitem:a586d4233fc4c94ba63cc3eb8bf7795e4" id="r_a586d4233fc4c94ba63cc3eb8bf7795e4"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a586d4233fc4c94ba63cc3eb8bf7795e4">bDebugEnabled</a> = false</td></tr>
@@ -141,14 +139,14 @@ Overview</h2>
 <p>Unlike standard static meshes, this component constructs a set of box colliders (AggGeom) representing the active voxels. It uses a binary greedy meshing algorithm to merge adjacent voxels into larger boxes to minimize the physics cost.</p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md1"></a>
 Usage</h2>
-<p>This is primarily designed for query-only interactions, such as:</p><ul>
-<li>Blocking AI Line of Sight (Visibility channel).</li>
-<li>Preventing camera clipping.</li>
-<li>Simple projectile blocking.</li>
+<p>This component uses the standard Collision category in the Details panel. By default, it is configured for Query-Only interactions:</p><ul>
+<li>Visibility: Blocked (Blocks AI Line of Sight).</li>
+<li>Others: Ignored (Players can walk through).</li>
 </ul>
+<p>You can customize these responses in the Collision Presets (set to 'Custom').</p>
 <dl class="section note"><dt>Note</dt><dd>Frequent updates to collision geometry are expensive. Use <span class="tt"><a class="el" href="#a59d22fb7acf6ed4a216250b8effc233d">MinCollisionUpdateInterval</a></span> and <span class="tt"><a class="el" href="#a65f83b67c0f01e7433c34e5c336747c5">MinCollisionUpdateVoxelNum</a></span> to throttle updates. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8h_source.html#l00028">28</a> of file <a class="el" href="_i_v_smoke_collision_component_8h_source.html">IVSmokeCollisionComponent.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8h_source.html#l00030">30</a> of file <a class="el" href="_i_v_smoke_collision_component_8h_source.html">IVSmokeCollisionComponent.h</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a40fc893a98f0e450d11c4b088e1d64cb" name="a40fc893a98f0e450d11c4b088e1d64cb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a40fc893a98f0e450d11c4b088e1d64cb">&#9670;&#160;</a></span>UIVSmokeCollisionComponent()</h2>
@@ -186,7 +184,7 @@ Usage</h2>
 </div><div class="memdoc">
 <p>Renders wireframe boxes for each generated collision element (<span class="tt">FKBoxElem</span>). Useful for visualizing how the greedy meshing algorithm has optimized the voxels. </p>
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8cpp_source.html#l00241">241</a> of file <a class="el" href="_i_v_smoke_collision_component_8cpp_source.html">IVSmokeCollisionComponent.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8cpp_source.html#l00229">229</a> of file <a class="el" href="_i_v_smoke_collision_component_8cpp_source.html">IVSmokeCollisionComponent.cpp</a>.</p>
 
 </div>
 </div>
@@ -213,7 +211,7 @@ Usage</h2>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8cpp_source.html#l00024">24</a> of file <a class="el" href="_i_v_smoke_collision_component_8cpp_source.html">IVSmokeCollisionComponent.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8cpp_source.html#l00036">36</a> of file <a class="el" href="_i_v_smoke_collision_component_8cpp_source.html">IVSmokeCollisionComponent.cpp</a>.</p>
 
 </div>
 </div>
@@ -240,7 +238,7 @@ Usage</h2>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8cpp_source.html#l00035">35</a> of file <a class="el" href="_i_v_smoke_collision_component_8cpp_source.html">IVSmokeCollisionComponent.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8cpp_source.html#l00047">47</a> of file <a class="el" href="_i_v_smoke_collision_component_8cpp_source.html">IVSmokeCollisionComponent.cpp</a>.</p>
 
 </div>
 </div>
@@ -260,7 +258,7 @@ Usage</h2>
 </div><div class="memdoc">
 <p>Clears all generated physics geometry and resets the collision state. Called when the simulation is stopped or reset to ensure no "ghost" collision remains. </p>
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8cpp_source.html#l00188">188</a> of file <a class="el" href="_i_v_smoke_collision_component_8cpp_source.html">IVSmokeCollisionComponent.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8cpp_source.html#l00204">204</a> of file <a class="el" href="_i_v_smoke_collision_component_8cpp_source.html">IVSmokeCollisionComponent.cpp</a>.</p>
 
 </div>
 </div>
@@ -322,7 +320,7 @@ Usage</h2>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8cpp_source.html#l00042">42</a> of file <a class="el" href="_i_v_smoke_collision_component_8cpp_source.html">IVSmokeCollisionComponent.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8cpp_source.html#l00054">54</a> of file <a class="el" href="_i_v_smoke_collision_component_8cpp_source.html">IVSmokeCollisionComponent.cpp</a>.</p>
 
 </div>
 </div>
@@ -340,7 +338,7 @@ Usage</h2>
 </div><div class="memdoc">
 <p>Master switch for voxel collision. If false, no physics geometry will be generated, and all update requests will be ignored. </p>
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8h_source.html#l00072">72</a> of file <a class="el" href="_i_v_smoke_collision_component_8h_source.html">IVSmokeCollisionComponent.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8h_source.html#l00074">74</a> of file <a class="el" href="_i_v_smoke_collision_component_8h_source.html">IVSmokeCollisionComponent.h</a>.</p>
 
 </div>
 </div>
@@ -357,24 +355,7 @@ Usage</h2>
 </div><div class="memdoc">
 <p>If true, draws debug visualization for the collision geometry in the editor. </p><dl class="section note"><dt>Note</dt><dd>Only works if <span class="tt">IVSmokeDebugSettings::bDebugEnabled</span> is also true on the main actor. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8h_source.html#l00138">138</a> of file <a class="el" href="_i_v_smoke_collision_component_8h_source.html">IVSmokeCollisionComponent.h</a>.</p>
-
-</div>
-</div>
-<a id="ac2b852d08ae56978c940d13599c282dc" name="ac2b852d08ae56978c940d13599c282dc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac2b852d08ae56978c940d13599c282dc">&#9670;&#160;</a></span>BlockChannelArray</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">TArray&lt;TEnumAsByte&lt;ECollisionChannel&gt; &gt; UIVSmokeCollisionComponent::BlockChannelArray</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>List of specific collision channels to set to <span class="tt">ECR_Block</span>. Useful if you want to block only specific traces (e.g., Visibility) without affecting physical movement. Overrides the settings from <span class="tt"><a class="el" href="#aa8a21fae21363b9f586ccd330c7ad925">SmokeCollisionProfileName</a></span> if specified. </p>
-
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8h_source.html#l00087">87</a> of file <a class="el" href="_i_v_smoke_collision_component_8h_source.html">IVSmokeCollisionComponent.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8h_source.html#l00122">122</a> of file <a class="el" href="_i_v_smoke_collision_component_8h_source.html">IVSmokeCollisionComponent.h</a>.</p>
 
 </div>
 </div>
@@ -391,7 +372,7 @@ Usage</h2>
 </div><div class="memdoc">
 <p>The minimum time (in seconds) that must pass between two consecutive physics geometry rebuilds. </p>
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8h_source.html#l00095">95</a> of file <a class="el" href="_i_v_smoke_collision_component_8h_source.html">IVSmokeCollisionComponent.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8h_source.html#l00082">82</a> of file <a class="el" href="_i_v_smoke_collision_component_8h_source.html">IVSmokeCollisionComponent.h</a>.</p>
 
 </div>
 </div>
@@ -408,24 +389,7 @@ Usage</h2>
 </div><div class="memdoc">
 <p>The minimum number of voxel changes (spawned or destroyed) required to trigger a physics geometry rebuild. </p>
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8h_source.html#l00091">91</a> of file <a class="el" href="_i_v_smoke_collision_component_8h_source.html">IVSmokeCollisionComponent.h</a>.</p>
-
-</div>
-</div>
-<a id="aa8a21fae21363b9f586ccd330c7ad925" name="aa8a21fae21363b9f586ccd330c7ad925"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa8a21fae21363b9f586ccd330c7ad925">&#9670;&#160;</a></span>SmokeCollisionProfileName</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">FName UIVSmokeCollisionComponent::SmokeCollisionProfileName = UCollisionProfile::NoCollision_ProfileName</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>The collision profile to apply to the generated geometry. Defaults to <span class="tt">NoCollision</span>. Change this to <span class="tt">BlockAll</span> or a custom profile to enable interaction. </p>
-
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8h_source.html#l00079">79</a> of file <a class="el" href="_i_v_smoke_collision_component_8h_source.html">IVSmokeCollisionComponent.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_collision_component_8h_source.html#l00078">78</a> of file <a class="el" href="_i_v_smoke_collision_component_8h_source.html">IVSmokeCollisionComponent.h</a>.</p>
 
 </div>
 </div>

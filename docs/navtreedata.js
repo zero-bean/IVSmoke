@@ -149,7 +149,9 @@ var NAVTREE =
         [ "Time Synchronization", "md_pages_2_voxel_volume_2_voxel_volume_guide.html#autotoc_md156", null ]
       ] ],
       [ "Interaction Components", "md_pages_2_voxel_volume_2_voxel_volume_guide.html#autotoc_md158", null ],
-      [ "Debugging", "md_pages_2_voxel_volume_2_voxel_volume_guide.html#autotoc_md160", null ]
+      [ "Debugging", "md_pages_2_voxel_volume_2_voxel_volume_guide.html#autotoc_md160", [
+        [ "Console Commands (CVars)", "md_pages_2_voxel_volume_2_voxel_volume_guide.html#autotoc_md162", null ]
+      ] ]
     ] ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
@@ -170,7 +172,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "_i_v_smoke_8_build_8cs_source.html",
-"functions_t.html"
+"functions.html",
+"struct_f_i_v_smoke_volume_g_p_u_data.html#aa03734e55ac15c7d45358f7ab29c37e6"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

@@ -9,6 +9,6 @@ var searchData=
   ['lightdirectionoverride_6',['LightDirectionOverride',['../class_u_i_v_smoke_settings.html#ad93690784063d6522bc740d9d37b99a0',1,'UIVSmokeSettings']]],
   ['lightmarchingdistance_7',['LightMarchingDistance',['../class_u_i_v_smoke_settings.html#aed2c17e98657fc3cb442dc9e677e2380',1,'UIVSmokeSettings']]],
   ['lightmarchingexpfactor_8',['LightMarchingExpFactor',['../class_u_i_v_smoke_settings.html#a22ac3be9033d9e6eb96ff323c74c1601',1,'UIVSmokeSettings']]],
-  ['lightmarchingsteps_9',['LightMarchingSteps',['../class_u_i_v_smoke_settings.html#adffcdaee606bcfdc15862fa0b07b4e35',1,'UIVSmokeSettings']]],
-  ['lightoccupancy_10',['LightOccupancy',['../struct_f_i_v_smoke_occupancy_resources.html#aafe9f0d628bc3929f707d1e6dcad0fec',1,'FIVSmokeOccupancyResources']]]
+  ['lightoccupancy_9',['LightOccupancy',['../struct_f_i_v_smoke_occupancy_resources.html#aafe9f0d628bc3929f707d1e6dcad0fec',1,'FIVSmokeOccupancyResources']]],
+  ['lowopacityremapthreshold_10',['LowOpacityRemapThreshold',['../class_u_i_v_smoke_visual_material_preset.html#ae8e9e716e2e1084652d4e17c0925dc28',1,'UIVSmokeVisualMaterialPreset']]]
 ];

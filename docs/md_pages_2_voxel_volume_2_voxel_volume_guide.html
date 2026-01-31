@@ -245,6 +245,25 @@ VoxelVolume_image.png</div></div>
 <p>Note on Checksums: The debug text displays a CRC32 Checksum. If you suspect a desync issue, compare this number between the Server and Client. They must match exactly. </p>
 </blockquote>
 <hr  />
+<h2 class="doxsection"><a class="anchor" id="autotoc_md162"></a>
+Console Commands (CVars)</h2>
+<p>You can control debug visualizations at runtime using the console (<span class="tt">~</span> key). These commands affect <b>all</b> active <span class="tt"><a class="el" href="class_a_i_v_smoke_voxel_volume.html">AIVSmokeVoxelVolume</a></span> actors in the world simultaneously.</p>
+<p>All commands share the prefix: <b><span class="tt">IVSmoke.Volume.</span></b></p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Command  </th><th class="markdownTableHeadNone">Arguments  </th><th class="markdownTableHeadNone">Description  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><b><span class="tt">IVSmoke.Volume.Debug</span></b>  </td><td class="markdownTableBodyNone"><span class="tt">0</span> or <span class="tt">1</span>  </td><td class="markdownTableBodyNone"><b>Master Switch.</b> Toggles the entire debug system on or off. Setting this to 0 hides all visualizations immediately.  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><b><span class="tt">IVSmoke.Volume.ShowWireframe</span></b>  </td><td class="markdownTableBodyNone"><span class="tt">0</span> or <span class="tt">1</span>  </td><td class="markdownTableBodyNone">Toggles the lightweight wireframe cube visualization for active voxels.  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><b><span class="tt">IVSmoke.Volume.ShowMesh</span></b>  </td><td class="markdownTableBodyNone"><span class="tt">0</span> or <span class="tt">1</span>  </td><td class="markdownTableBodyNone">Toggles the Instanced Static Mesh visualization. <b>Warning:</b> Rendering thousands of meshes can be expensive.  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><b><span class="tt">IVSmoke.Volume.ShowStatus</span></b>  </td><td class="markdownTableBodyNone"><span class="tt">0</span> or <span class="tt">1</span>  </td><td class="markdownTableBodyNone">Toggles the floating status text (State, Voxel Count, Checksum) above the actor.  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><b><span class="tt">IVSmoke.Volume.SetViewMode</span></b>  </td><td class="markdownTableBodyNone"><span class="tt">Mode ID</span>  </td><td class="markdownTableBodyNone">Changes visualization color. Use <b><span class="tt">0</span></b> for Solid Color (default) or <b><span class="tt">1</span></b> for Heatmap (gradient based on generation order).  </td></tr>
+</table>
+<hr  />
 <p><em>Copyright (c) 2026, Team SDB. All rights reserved.</em> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

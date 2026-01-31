@@ -177,7 +177,7 @@ Before. Add UIVSmokeHoleRequestComponent</h2>
 <img src="HoleGeneratorComponent_image6.png" alt=""/>
 <div class="caption">
 HoleGeneratorComponent_image6.png</div></div>
-    <p>Before utilizing any Request Nodes, ensure that the <b><span class="tt">UIVSmokeHoleRequestComponent</span></b> has been added to the subject Character or Pawn class actor.</p>
+    <p>Before utilizing any Request Nodes, ensure that the <b><span class="tt"><a class="el" href="class_u_i_v_smoke_hole_request_component.html" title="Handles network routing for hole requests. This component enables clients to request holes on VoxelVo...">UIVSmokeHoleRequestComponent</a></span></b> has been added to the subject Character or Pawn class actor.</p>
 <ul>
 <li><b>Role:</b> This component facilitates the interaction queries between the actor and the smoke volume.</li>
 <li><b>Dependency:</b> It is a mandatory requirement if you are using an <b><span class="tt"><a class="el" href="class_a_i_v_smoke_voxel_volume.html">AIVSmokeVoxelVolume</a></span></b> actor equipped with the <b><span class="tt"><a class="el" href="class_u_i_v_smoke_hole_generator_component.html" title="Component that generates hole texture for volumetric smoke. Provides public API for penetration and e...">UIVSmokeHoleGeneratorComponent</a></span></b> to generate smoke holes.</li>
@@ -196,7 +196,7 @@ HoleGeneratorComponent_image7.png</div></div>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone"><b>Pin Name</b>  </th><th class="markdownTableHeadNone"><b>Connection Value &amp; Method</b>  </th><th class="markdownTableHeadNone"><b>Notes</b>  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>Target</b>  </td><td class="markdownTableBodyNone">Call <b>Get Hole Requester</b> node  </td><td class="markdownTableBodyNone">References the <span class="tt">UIVSmokeHoleRequestComponent</span>. <b>Mandatory for multiplayer functionality;</b> it will not function if left empty.  </td></tr>
+<td class="markdownTableBodyNone"><b>Target</b>  </td><td class="markdownTableBodyNone">Call <b>Get Hole Requester</b> node  </td><td class="markdownTableBodyNone">References the <span class="tt"><a class="el" href="class_u_i_v_smoke_hole_request_component.html" title="Handles network routing for hole requests. This component enables clients to request holes on VoxelVo...">UIVSmokeHoleRequestComponent</a></span>. <b>Mandatory for multiplayer functionality;</b> it will not function if left empty.  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><b>IVSmokeHoleGeneratorComponent</b>  </td><td class="markdownTableBodyNone"><span class="tt">Other Comp</span> from Overlap/Hit  </td><td class="markdownTableBodyNone">Connect the <span class="tt">IVSmokeHoleGeneratorComponent</span> belonging to the collided smoke volume.  </td></tr>
 <tr class="markdownTableRowOdd">
@@ -220,7 +220,7 @@ HoleGeneratorComponent_image8.png</div></div>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone"><b>Pin Name</b>  </th><th class="markdownTableHeadNone"><b>Connection Value &amp; Method</b>  </th><th class="markdownTableHeadNone"><b>Notes</b>  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>Target</b>  </td><td class="markdownTableBodyNone">Call <b>Get Hole Requester</b> node  </td><td class="markdownTableBodyNone">References the <span class="tt">UIVSmokeHoleRequestComponent</span>. <b>Mandatory for multiplayer;</b> the request will fail if this component is not registered.  </td></tr>
+<td class="markdownTableBodyNone"><b>Target</b>  </td><td class="markdownTableBodyNone">Call <b>Get Hole Requester</b> node  </td><td class="markdownTableBodyNone">References the <span class="tt"><a class="el" href="class_u_i_v_smoke_hole_request_component.html" title="Handles network routing for hole requests. This component enables clients to request holes on VoxelVo...">UIVSmokeHoleRequestComponent</a></span>. <b>Mandatory for multiplayer;</b> the request will fail if this component is not registered.  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><b>IVSmokeHoleGeneratorComponent</b>  </td><td class="markdownTableBodyNone"><span class="tt">Other Comp</span> from Overlap/Hit  </td><td class="markdownTableBodyNone">Connect the <span class="tt">IVSmokeHoleGeneratorComponent</span> of the smoke volume that was hit.  </td></tr>
 <tr class="markdownTableRowOdd">
@@ -242,7 +242,7 @@ HoleGeneratorComponent_image9.png</div></div>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone"><b>Pin Name</b>  </th><th class="markdownTableHeadNone"><b>Connection Value &amp; Method</b>  </th><th class="markdownTableHeadNone"><b>Notes</b>  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>Target</b>  </td><td class="markdownTableBodyNone">Call <b>Get Hole Requester</b> node  </td><td class="markdownTableBodyNone">References the <span class="tt">UIVSmokeHoleRequestComponent</span>. <b>Mandatory for multiplayer;</b> ensure this component is added to your actor.  </td></tr>
+<td class="markdownTableBodyNone"><b>Target</b>  </td><td class="markdownTableBodyNone">Call <b>Get Hole Requester</b> node  </td><td class="markdownTableBodyNone">References the <span class="tt"><a class="el" href="class_u_i_v_smoke_hole_request_component.html" title="Handles network routing for hole requests. This component enables clients to request holes on VoxelVo...">UIVSmokeHoleRequestComponent</a></span>. <b>Mandatory for multiplayer;</b> ensure this component is added to your actor.  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><b>IVSmokeHoleGeneratorComponent</b>  </td><td class="markdownTableBodyNone"><span class="tt">Other Comp</span> from Overlap  </td><td class="markdownTableBodyNone">Connect the <span class="tt">IVSmokeHoleGeneratorComponent</span> belonging to the smoke volume the actor has entered.  </td></tr>
 <tr class="markdownTableRowOdd">

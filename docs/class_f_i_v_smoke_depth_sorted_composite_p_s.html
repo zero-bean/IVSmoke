@@ -133,7 +133,7 @@ Static Public Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Depth-Sorted Composite pixel shader. Compares Z values to determine front/back ordering, then applies standard over blending. Properly composites smoke and particles based on their depth relationship. </p>
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_shaders_8h_source.html#l00275">275</a> of file <a class="el" href="_i_v_smoke_shaders_8h_source.html">IVSmokeShaders.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_shaders_8h_source.html#l00323">323</a> of file <a class="el" href="_i_v_smoke_shaders_8h_source.html">IVSmokeShaders.h</a>.</p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="af467e415ebaa382e1cb9edc7e9067638" name="af467e415ebaa382e1cb9edc7e9067638"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af467e415ebaa382e1cb9edc7e9067638">&#9670;&#160;</a></span>GetBlendState()</h2>
@@ -158,7 +158,7 @@ Static Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_shaders_8h_source.html#l00279">279</a> of file <a class="el" href="_i_v_smoke_shaders_8h_source.html">IVSmokeShaders.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_shaders_8h_source.html#l00327">327</a> of file <a class="el" href="_i_v_smoke_shaders_8h_source.html">IVSmokeShaders.h</a>.</p>
 
 </div>
 </div>
@@ -184,9 +184,9 @@ Static Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Smoke albedo (color) from ray marching CS. Smoke opacity mask from ray marching CS. SeparateTranslucency texture (particles). Scene textures uniform buffer (CustomDepth, SceneDepth). Point sampler with clamp addressing. Linear sampler with clamp addressing. Smoke texture extent for UV calculation. Sharpen/blur amount (-1 to 1, 0 = no filter). Transform for converting device Z to world Z. </p>
+<p>Smoke visual texture from SmokeVisualPass. Smoke (LocalPos, Alpha) from ray marching. Smoke (WorldPos, Depth) from ray marching. SeparateTranslucency texture (particles). Scene textures uniform buffer (CustomDepth, SceneDepth). Point sampler with clamp addressing. Linear sampler with clamp addressing. Viewport size for UV calculation. View rect offset for multi-view support. Transform for converting device Z to world Z. Alpha processing type in composite pass. Minimum alpha threshold for rendering. Pixels with alpha below this value will be discarded. Only used when VisualAlphaType is CutOff. </p>
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_shaders_8h_source.html#l00315">315</a> of file <a class="el" href="_i_v_smoke_shaders_8h_source.html">IVSmokeShaders.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_shaders_8h_source.html#l00368">368</a> of file <a class="el" href="_i_v_smoke_shaders_8h_source.html">IVSmokeShaders.h</a>.</p>
 
 </div>
 </div>
@@ -211,7 +211,7 @@ Static Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_shaders_8h_source.html#l00278">278</a> of file <a class="el" href="_i_v_smoke_shaders_8h_source.html">IVSmokeShaders.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_shaders_8h_source.html#l00326">326</a> of file <a class="el" href="_i_v_smoke_shaders_8h_source.html">IVSmokeShaders.h</a>.</p>
 
 </div>
 </div>

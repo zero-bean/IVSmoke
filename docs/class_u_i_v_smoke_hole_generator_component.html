@@ -101,9 +101,9 @@ Inheritance diagram for UIVSmokeHoleGeneratorComponent:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_u_i_v_smoke_hole_generator_component__inherit__graph.png" border="0" usemap="#a_u_i_v_smoke_hole_generator_component_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
 <map name="a_u_i_v_smoke_hole_generator_component_inherit__map" id="a_u_i_v_smoke_hole_generator_component_inherit__map">
-<area shape="rect" title="Component that generates hole texture for volumetric smoke. Provides public API for penetration and e..." alt="" coords="5,123,252,469"/>
+<area shape="rect" title="Component that generates hole texture for volumetric smoke. Provides public API for penetration and e..." alt="" coords="5,123,252,597"/>
 <area shape="rect" title=" " alt="" coords="74,5,184,75"/>
-<area shape="poly" title=" " alt="" coords="129,87,131,123,126,123,128,92"/>
+<area shape="poly" title=" " alt="" coords="129,86,131,123,126,123,128,92"/>
 </map>
 </div>
 <div class="dynheader">
@@ -111,17 +111,21 @@ Collaboration diagram for UIVSmokeHoleGeneratorComponent:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_u_i_v_smoke_hole_generator_component__coll__graph.png" border="0" usemap="#a_u_i_v_smoke_hole_generator_component_coll__map" loading="lazy" alt="Collaboration graph"/></div>
 <map name="a_u_i_v_smoke_hole_generator_component_coll__map" id="a_u_i_v_smoke_hole_generator_component_coll__map">
-<area shape="rect" title="Component that generates hole texture for volumetric smoke. Provides public API for penetration and e..." alt="" coords="5,123,252,469"/>
-<area shape="rect" title=" " alt="" coords="74,5,184,75"/>
-<area shape="poly" title=" " alt="" coords="129,87,131,123,126,123,128,92"/>
+<area shape="rect" title="Component that generates hole texture for volumetric smoke. Provides public API for penetration and e..." alt="" coords="22,232,270,643"/>
+<area shape="rect" title=" " alt="" coords="5,27,116,96"/>
+<area shape="poly" title=" " alt="" coords="72,108,102,232,97,232,71,113"/>
+<area shape="rect" href="struct_f_i_v_smoke_hole_noise_settings.html" title="Noise settings for hole shape distortion." alt="" coords="140,5,322,117"/>
+<area shape="poly" title=" " alt="" coords="220,114,199,216,194,215,218,119"/>
 </map>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a227c41d665c3944e274e1773b81e63f1" id="r_a227c41d665c3944e274e1773b81e63f1"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a227c41d665c3944e274e1773b81e63f1">RequestPenetrationHole</a> (const FVector3f Origin, const FVector3f Direction, <a class="el" href="class_u_i_v_smoke_hole_preset.html">UIVSmokeHolePreset</a> *Preset)</td></tr>
-<tr class="memitem:aae055305f55742e021ee18ae1cb9fb6f" id="r_aae055305f55742e021ee18ae1cb9fb6f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aae055305f55742e021ee18ae1cb9fb6f">RequestExplosionHole</a> (const FVector3f Origin, <a class="el" href="class_u_i_v_smoke_hole_preset.html">UIVSmokeHolePreset</a> *Preset)</td></tr>
-<tr class="memitem:a1d284e92541eb253ba5b6aab0d0d6137" id="r_a1d284e92541eb253ba5b6aab0d0d6137"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a1d284e92541eb253ba5b6aab0d0d6137">RequestTrackDynamicObject</a> (AActor *TargetActor, <a class="el" href="class_u_i_v_smoke_hole_preset.html">UIVSmokeHolePreset</a> *Preset)</td></tr>
+<tr class="memitem:acf3de11bd309675a3364d155b4b04fe7" id="r_acf3de11bd309675a3364d155b4b04fe7"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#acf3de11bd309675a3364d155b4b04fe7">PostInitProperties</a> () override</td></tr>
+<tr class="memitem:a56cd47e0707eb30b6d9f7eb39c8f5033" id="r_a56cd47e0707eb30b6d9f7eb39c8f5033"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a56cd47e0707eb30b6d9f7eb39c8f5033">Reset</a> ()</td></tr>
+<tr class="memitem:a85c1d6a7310ad9be98b47f516da4f8fd" id="r_a85c1d6a7310ad9be98b47f516da4f8fd"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a85c1d6a7310ad9be98b47f516da4f8fd">CreatePenetrationHole</a> (const FVector3f &amp;Origin, const FVector3f &amp;Direction, const uint8 PresetID)</td></tr>
+<tr class="memitem:a479f1d1ccae9cce07b5a6c100d7d5689" id="r_a479f1d1ccae9cce07b5a6c100d7d5689"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a479f1d1ccae9cce07b5a6c100d7d5689">CreateExplosionHole</a> (const FVector3f &amp;Origin, const uint8 PresetID)</td></tr>
+<tr class="memitem:addbdeeece29eccdb695ef3638c82ad1d" id="r_addbdeeece29eccdb695ef3638c82ad1d"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#addbdeeece29eccdb695ef3638c82ad1d">RegisterTrackDynamicHole</a> (AActor *TargetActor, const uint8 PresetID)</td></tr>
 <tr class="memitem:a522a4fba7daa952f9533c790ab925170" id="r_a522a4fba7daa952f9533c790ab925170"><td class="memItemLeft">float&#160;</td><td class="memItemRight"><a class="el" href="#a522a4fba7daa952f9533c790ab925170">GetSyncedTime</a> () const</td></tr>
 <tr class="memitem:a6fa36f3322d58955ccebf773745ad947" id="r_a6fa36f3322d58955ccebf773745ad947"><td class="memItemLeft">FTextureRHIRef&#160;</td><td class="memItemRight"><a class="el" href="#a6fa36f3322d58955ccebf773745ad947">GetHoleTextureRHI</a> () const</td></tr>
 <tr class="memitem:a0b607c06a349f6cc23ee85575590f2cc" id="r_a0b607c06a349f6cc23ee85575590f2cc"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a0b607c06a349f6cc23ee85575590f2cc">SetBoxToVoxelAABB</a> ()</td></tr>
@@ -132,6 +136,10 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a1a74e1c9567dde329ad5cf1719a9ff57" id="r_a1a74e1c9567dde329ad5cf1719a9ff57"><td class="memItemLeft">int32&#160;</td><td class="memItemRight"><a class="el" href="#a1a74e1c9567dde329ad5cf1719a9ff57">MaxHoles</a> = 128</td></tr>
 <tr class="memitem:aa2b0ae7af26b7556056531c5f1082dcb" id="r_aa2b0ae7af26b7556056531c5f1082dcb"><td class="memItemLeft">FIntVector&#160;</td><td class="memItemRight"><a class="el" href="#aa2b0ae7af26b7556056531c5f1082dcb">VoxelResolution</a> = FIntVector(64, 64, 64)</td></tr>
 <tr class="memitem:a55d5a8ac0585653d2e1f45a6162b8918" id="r_a55d5a8ac0585653d2e1f45a6162b8918"><td class="memItemLeft">TArray&lt; TEnumAsByte&lt; EObjectTypeQuery &gt; &gt;&#160;</td><td class="memItemRight"><a class="el" href="#a55d5a8ac0585653d2e1f45a6162b8918">ObstacleObjectTypes</a></td></tr>
+<tr class="memitem:ae18a49cf69b05701b95dd2a7f2e11227" id="r_ae18a49cf69b05701b95dd2a7f2e11227"><td class="memItemLeft">int32&#160;</td><td class="memItemRight"><a class="el" href="#ae18a49cf69b05701b95dd2a7f2e11227">BlurStep</a> = 2</td></tr>
+<tr class="memitem:af7cd5851e9c699c8809a1de4f72975a8" id="r_af7cd5851e9c699c8809a1de4f72975a8"><td class="memItemLeft"><a class="el" href="struct_f_i_v_smoke_hole_noise_settings.html">FIVSmokeHoleNoiseSettings</a>&#160;</td><td class="memItemRight"><a class="el" href="#af7cd5851e9c699c8809a1de4f72975a8">PenetrationNoise</a></td></tr>
+<tr class="memitem:a166bb9e33a29646a780f9746da0816f1" id="r_a166bb9e33a29646a780f9746da0816f1"><td class="memItemLeft"><a class="el" href="struct_f_i_v_smoke_hole_noise_settings.html">FIVSmokeHoleNoiseSettings</a>&#160;</td><td class="memItemRight"><a class="el" href="#a166bb9e33a29646a780f9746da0816f1">ExplosionNoise</a></td></tr>
+<tr class="memitem:a9b58795e1926f286460b6e99e4a07c14" id="r_a9b58795e1926f286460b6e99e4a07c14"><td class="memItemLeft"><a class="el" href="struct_f_i_v_smoke_hole_noise_settings.html">FIVSmokeHoleNoiseSettings</a>&#160;</td><td class="memItemRight"><a class="el" href="#a9b58795e1926f286460b6e99e4a07c14">DynamicNoise</a></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pro-methods" class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -143,7 +151,7 @@ Protected Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Component that generates hole texture for volumetric smoke. Provides public API for penetration and explosion holes. </p>
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html#l00017">17</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html">IVSmokeHoleGeneratorComponent.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html#l00018">18</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html">IVSmokeHoleGeneratorComponent.h</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a063a64269f91a6e120bcb9174281f41b" name="a063a64269f91a6e120bcb9174281f41b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a063a64269f91a6e120bcb9174281f41b">&#9670;&#160;</a></span>UIVSmokeHoleGeneratorComponent()</h2>
@@ -160,7 +168,7 @@ Protected Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00021">21</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00023">23</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
 
 </div>
 </div>
@@ -188,7 +196,60 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00028">28</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00040">40</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a479f1d1ccae9cce07b5a6c100d7d5689" name="a479f1d1ccae9cce07b5a6c100d7d5689"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a479f1d1ccae9cce07b5a6c100d7d5689">&#9670;&#160;</a></span>CreateExplosionHole()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UIVSmokeHoleGeneratorComponent::CreateExplosionHole </td>
+          <td>(</td>
+          <td class="paramtype">const FVector3f &amp;</td>          <td class="paramname"><span class="paramname"><em>Origin</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint8</td>          <td class="paramname"><span class="paramname"><em>PresetID</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Create explosion hole. Called on server via <a class="el" href="class_u_i_v_smoke_hole_request_component.html" title="Handles network routing for hole requests. This component enables clients to request holes on VoxelVo...">UIVSmokeHoleRequestComponent</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00167">167</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a85c1d6a7310ad9be98b47f516da4f8fd" name="a85c1d6a7310ad9be98b47f516da4f8fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85c1d6a7310ad9be98b47f516da4f8fd">&#9670;&#160;</a></span>CreatePenetrationHole()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UIVSmokeHoleGeneratorComponent::CreatePenetrationHole </td>
+          <td>(</td>
+          <td class="paramtype">const FVector3f &amp;</td>          <td class="paramname"><span class="paramname"><em>Origin</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const FVector3f &amp;</td>          <td class="paramname"><span class="paramname"><em>Direction</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint8</td>          <td class="paramname"><span class="paramname"><em>PresetID</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Create penetration hole. Called on server via <a class="el" href="class_u_i_v_smoke_hole_request_component.html" title="Handles network routing for hole requests. This component enables clients to request holes on VoxelVo...">UIVSmokeHoleRequestComponent</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00130">130</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
 
 </div>
 </div>
@@ -215,7 +276,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00077">77</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00096">96</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
 
 </div>
 </div>
@@ -235,7 +296,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Get Texture as a UTextureRenderTargetVolume to write by. </p>
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00544">544</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00669">669</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
 
 </div>
 </div>
@@ -262,7 +323,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00082">82</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00101">101</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
 
 </div>
 </div>
@@ -282,7 +343,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Get synchronized server time. </p>
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00516">516</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00641">641</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
 
 </div>
 </div>
@@ -310,84 +371,78 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Set Dirty flag whether GPU updates the texure. </p>
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html#l00124">124</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html">IVSmokeHoleGeneratorComponent.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html#l00133">133</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html">IVSmokeHoleGeneratorComponent.h</a>.</p>
 
 </div>
 </div>
-<a id="aae055305f55742e021ee18ae1cb9fb6f" name="aae055305f55742e021ee18ae1cb9fb6f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aae055305f55742e021ee18ae1cb9fb6f">&#9670;&#160;</a></span>RequestExplosionHole()</h2>
+<a id="acf3de11bd309675a3364d155b4b04fe7" name="acf3de11bd309675a3364d155b4b04fe7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf3de11bd309675a3364d155b4b04fe7">&#9670;&#160;</a></span>PostInitProperties()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void UIVSmokeHoleGeneratorComponent::RequestExplosionHole </td>
+          <td class="memname">void UIVSmokeHoleGeneratorComponent::PostInitProperties </td>
           <td>(</td>
-          <td class="paramtype">const FVector3f</td>          <td class="paramname"><span class="paramname"><em>Origin</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_u_i_v_smoke_hole_preset.html">UIVSmokeHolePreset</a> *</td>          <td class="paramname"><span class="paramname"><em>Preset</em></span>&#160;)</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
-<p>Request an explosion hole at the specified origin. such as grenade (todo: must be refactored) </p>
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00108">108</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00031">31</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a227c41d665c3944e274e1773b81e63f1" name="a227c41d665c3944e274e1773b81e63f1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a227c41d665c3944e274e1773b81e63f1">&#9670;&#160;</a></span>RequestPenetrationHole()</h2>
+<a id="addbdeeece29eccdb695ef3638c82ad1d" name="addbdeeece29eccdb695ef3638c82ad1d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#addbdeeece29eccdb695ef3638c82ad1d">&#9670;&#160;</a></span>RegisterTrackDynamicHole()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void UIVSmokeHoleGeneratorComponent::RequestPenetrationHole </td>
-          <td>(</td>
-          <td class="paramtype">const FVector3f</td>          <td class="paramname"><span class="paramname"><em>Origin</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const FVector3f</td>          <td class="paramname"><span class="paramname"><em>Direction</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="class_u_i_v_smoke_hole_preset.html">UIVSmokeHolePreset</a> *</td>          <td class="paramname"><span class="paramname"><em>Preset</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Request a penetration hole such as bullet, projectile and hitscan </p>
-
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00091">91</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a1d284e92541eb253ba5b6aab0d0d6137" name="a1d284e92541eb253ba5b6aab0d0d6137"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1d284e92541eb253ba5b6aab0d0d6137">&#9670;&#160;</a></span>RequestTrackDynamicObject()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void UIVSmokeHoleGeneratorComponent::RequestTrackDynamicObject </td>
+          <td class="memname">void UIVSmokeHoleGeneratorComponent::RegisterTrackDynamicHole </td>
           <td>(</td>
           <td class="paramtype">AActor *</td>          <td class="paramname"><span class="paramname"><em>TargetActor</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_u_i_v_smoke_hole_preset.html">UIVSmokeHolePreset</a> *</td>          <td class="paramname"><span class="paramname"><em>Preset</em></span>&#160;)</td>
+          <td class="paramtype">const uint8</td>          <td class="paramname"><span class="paramname"><em>PresetID</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Request registration of tracking dynamic object such as human and vehicle </p>
+<p>Register dynamic object. Called on server via <a class="el" href="class_u_i_v_smoke_hole_request_component.html" title="Handles network routing for hole requests. This component enables clients to request holes on VoxelVo...">UIVSmokeHoleRequestComponent</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00125">125</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00206">206</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a56cd47e0707eb30b6d9f7eb39c8f5033" name="a56cd47e0707eb30b6d9f7eb39c8f5033"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a56cd47e0707eb30b6d9f7eb39c8f5033">&#9670;&#160;</a></span>Reset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UIVSmokeHoleGeneratorComponent::Reset </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Reset all holes and dynamic subjects to initial state. </p>
+
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00110">110</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
 
 </div>
 </div>
@@ -407,7 +462,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Set BoxExtent and Component Position to VoxelAABB Center. </p>
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00530">530</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00655">655</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
 
 </div>
 </div>
@@ -443,11 +498,62 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00047">47</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html#l00059">59</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8cpp_source.html">IVSmokeHoleGeneratorComponent.cpp</a>.</p>
 
 </div>
 </div>
 <a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
+<a id="ae18a49cf69b05701b95dd2a7f2e11227" name="ae18a49cf69b05701b95dd2a7f2e11227"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae18a49cf69b05701b95dd2a7f2e11227">&#9670;&#160;</a></span>BlurStep</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int32 UIVSmokeHoleGeneratorComponent::BlurStep = 2</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Blur radius in voxels. </p>
+
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html#l00109">109</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html">IVSmokeHoleGeneratorComponent.h</a>.</p>
+
+</div>
+</div>
+<a id="a9b58795e1926f286460b6e99e4a07c14" name="a9b58795e1926f286460b6e99e4a07c14"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b58795e1926f286460b6e99e4a07c14">&#9670;&#160;</a></span>DynamicNoise</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="struct_f_i_v_smoke_hole_noise_settings.html">FIVSmokeHoleNoiseSettings</a> UIVSmokeHoleGeneratorComponent::DynamicNoise</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Noise settings for dynamic holes. </p>
+
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html#l00121">121</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html">IVSmokeHoleGeneratorComponent.h</a>.</p>
+
+</div>
+</div>
+<a id="a166bb9e33a29646a780f9746da0816f1" name="a166bb9e33a29646a780f9746da0816f1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a166bb9e33a29646a780f9746da0816f1">&#9670;&#160;</a></span>ExplosionNoise</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="struct_f_i_v_smoke_hole_noise_settings.html">FIVSmokeHoleNoiseSettings</a> UIVSmokeHoleGeneratorComponent::ExplosionNoise</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Noise settings for explosion holes. </p>
+
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html#l00117">117</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html">IVSmokeHoleGeneratorComponent.h</a>.</p>
+
+</div>
+</div>
 <a id="a1a74e1c9567dde329ad5cf1719a9ff57" name="a1a74e1c9567dde329ad5cf1719a9ff57"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1a74e1c9567dde329ad5cf1719a9ff57">&#9670;&#160;</a></span>MaxHoles</h2>
 
@@ -461,7 +567,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Maximum number of holes that can be activated. </p>
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html#l00103">103</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html">IVSmokeHoleGeneratorComponent.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html#l00095">95</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html">IVSmokeHoleGeneratorComponent.h</a>.</p>
 
 </div>
 </div>
@@ -478,7 +584,24 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Maximum number of holes that can be activated. </p>
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html#l00112">112</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html">IVSmokeHoleGeneratorComponent.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html#l00104">104</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html">IVSmokeHoleGeneratorComponent.h</a>.</p>
+
+</div>
+</div>
+<a id="af7cd5851e9c699c8809a1de4f72975a8" name="af7cd5851e9c699c8809a1de4f72975a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af7cd5851e9c699c8809a1de4f72975a8">&#9670;&#160;</a></span>PenetrationNoise</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="struct_f_i_v_smoke_hole_noise_settings.html">FIVSmokeHoleNoiseSettings</a> UIVSmokeHoleGeneratorComponent::PenetrationNoise</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Noise settings for penetration holes. </p>
+
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html#l00113">113</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html">IVSmokeHoleGeneratorComponent.h</a>.</p>
 
 </div>
 </div>
@@ -495,7 +618,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Hole voxel volume resolution. </p>
 
-<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html#l00107">107</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html">IVSmokeHoleGeneratorComponent.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html#l00099">99</a> of file <a class="el" href="_i_v_smoke_hole_generator_component_8h_source.html">IVSmokeHoleGeneratorComponent.h</a>.</p>
 
 </div>
 </div>

@@ -1,6 +1,7 @@
 var struct_f_i_v_smoke_hole_array =
 [
     [ "AddHole", "struct_f_i_v_smoke_hole_array.html#a672cf3fc8492dabcf6ebc8ab4a4be920", null ],
+    [ "Empty", "struct_f_i_v_smoke_hole_array.html#aa45b9aa4d807cdf227f8ae301d2a3797", null ],
     [ "GetHoleGPUData", "struct_f_i_v_smoke_hole_array.html#aba5c1d94fd9a8ac207b84e4d03654616", null ],
     [ "IsValidIndex", "struct_f_i_v_smoke_hole_array.html#a045dfae532c8e4100b733d50bf2ec296", null ],
     [ "NetDeltaSerialize", "struct_f_i_v_smoke_hole_array.html#a1606705a0db36b04e48845f78f494584", null ],

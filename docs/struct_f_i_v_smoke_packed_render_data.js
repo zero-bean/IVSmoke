@@ -12,6 +12,7 @@ var struct_f_i_v_smoke_packed_render_data =
     [ "PackedVoxelBirthTimes", "struct_f_i_v_smoke_packed_render_data.html#a052ac503c2be38868843e86597f1b9f9", null ],
     [ "PackedVoxelDeathTimes", "struct_f_i_v_smoke_packed_render_data.html#a0e62820c6ff566e98c5cbb6b09cb6d07", null ],
     [ "Sharpness", "struct_f_i_v_smoke_packed_render_data.html#a9066f45f7e7b0f67200edb4fa5c4ce67", null ],
+    [ "SmokeVisualMaterial", "struct_f_i_v_smoke_packed_render_data.html#aee5891b0072f9aac332541286c051cea", null ],
     [ "VolumeDataArray", "struct_f_i_v_smoke_packed_render_data.html#a1da45d51d370d65bca0045104871a4aa", null ],
     [ "VoxelResolution", "struct_f_i_v_smoke_packed_render_data.html#acf78e820c465ce2bc1835dcbbe33487e", null ]
 ];

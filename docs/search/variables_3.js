@@ -10,8 +10,8 @@ var searchData=
   ['dissipationnoise_7',['DissipationNoise',['../class_a_i_v_smoke_voxel_volume.html#ad80330806a2b12bc75565574421e1dd6',1,'AIVSmokeVoxelVolume']]],
   ['dissipationstarttime_8',['DissipationStartTime',['../struct_f_i_v_smoke_server_state.html#a0a93113505d1abec448fef46df5f5916',1,'FIVSmokeServerState']]],
   ['distancethreshold_9',['DistanceThreshold',['../class_u_i_v_smoke_hole_preset.html#a50d94a7edf240aac96aaec0294c1d4fb',1,'UIVSmokeHolePreset']]],
-  ['distortioncurveoverdistance_10',['DistortionCurveOverDistance',['../struct_f_i_v_smoke_hole_g_p_u.html#a9f307df502e6cdf6614fe0516054bc4d',1,'FIVSmokeHoleGPU::DistortionCurveOverDistance'],['../class_u_i_v_smoke_hole_preset.html#a99cfe623120eda040ed1324dc31d33e8',1,'UIVSmokeHolePreset::DistortionCurveOverDistance']]],
-  ['distortioncurveovertime_11',['DistortionCurveOverTime',['../class_u_i_v_smoke_hole_preset.html#ab10c50d4d7ffd9392da54f01b5b1d6cf',1,'UIVSmokeHolePreset']]],
-  ['distortiondistance_12',['DistortionDistance',['../struct_f_i_v_smoke_hole_g_p_u.html#a10f5b7cee433e92e55686c953963bd53',1,'FIVSmokeHoleGPU::DistortionDistance'],['../class_u_i_v_smoke_hole_preset.html#a8865ba3a05ee41731e0d7a4da4e6ee85',1,'UIVSmokeHolePreset::DistortionDistance']]],
-  ['duration_13',['Duration',['../struct_f_i_v_smoke_hole_g_p_u.html#a645208cb2ccc34402b8d82997d07a5b6',1,'FIVSmokeHoleGPU::Duration'],['../class_u_i_v_smoke_hole_preset.html#aa18b922ee7aeba5183dd418ff071d248',1,'UIVSmokeHolePreset::Duration']]]
+  ['distortiondistance_10',['DistortionDistance',['../class_u_i_v_smoke_hole_preset.html#a8865ba3a05ee41731e0d7a4da4e6ee85',1,'UIVSmokeHolePreset::DistortionDistance'],['../struct_f_i_v_smoke_hole_g_p_u.html#a10f5b7cee433e92e55686c953963bd53',1,'FIVSmokeHoleGPU::DistortionDistance']]],
+  ['distortionexpovertime_11',['DistortionExpOverTime',['../class_u_i_v_smoke_hole_preset.html#a4c1cc4228214fd0a11a9fd5ad5503053',1,'UIVSmokeHolePreset::DistortionExpOverTime'],['../struct_f_i_v_smoke_hole_g_p_u.html#a6737e71724cfecda4fe9916f21796358',1,'FIVSmokeHoleGPU::DistortionExpOverTime']]],
+  ['duration_12',['Duration',['../class_u_i_v_smoke_hole_preset.html#aa18b922ee7aeba5183dd418ff071d248',1,'UIVSmokeHolePreset::Duration'],['../struct_f_i_v_smoke_hole_g_p_u.html#a645208cb2ccc34402b8d82997d07a5b6',1,'FIVSmokeHoleGPU::Duration']]],
+  ['dynamicnoise_13',['DynamicNoise',['../class_u_i_v_smoke_hole_generator_component.html#a9b58795e1926f286460b6e99e4a07c14',1,'UIVSmokeHoleGeneratorComponent']]]
 ];

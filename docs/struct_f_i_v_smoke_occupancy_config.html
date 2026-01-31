@@ -108,8 +108,8 @@ Static Public Attributes</h2></td></tr>
 <tr class="memitem:a7fcd77f0d87227d356624c989c2b5b38" id="r_a7fcd77f0d87227d356624c989c2b5b38"><td class="memItemLeft">static constexpr uint32&#160;</td><td class="memItemRight"><a class="el" href="#a7fcd77f0d87227d356624c989c2b5b38">TileSizeY</a> = 16</td></tr>
 <tr class="memitem:ae133d58a822de3eb0b93903625e7f84a" id="r_ae133d58a822de3eb0b93903625e7f84a"><td class="memItemLeft">static constexpr uint32&#160;</td><td class="memItemRight"><a class="el" href="#ae133d58a822de3eb0b93903625e7f84a">StepDivisor</a> = 4</td></tr>
 <tr class="memitem:ad9c43934dd3743b927d33007e522528f" id="r_ad9c43934dd3743b927d33007e522528f"><td class="memItemLeft">static constexpr uint32&#160;</td><td class="memItemRight"><a class="el" href="#ad9c43934dd3743b927d33007e522528f">MaxVolumes</a> = 128</td></tr>
-<tr class="memitem:ae96cd7b47fe5fb1f235ae00763941558" id="r_ae96cd7b47fe5fb1f235ae00763941558"><td class="memItemLeft">static constexpr uint32&#160;</td><td class="memItemRight"><a class="el" href="#ae96cd7b47fe5fb1f235ae00763941558">TileSetupThreadsX</a> = 8</td></tr>
-<tr class="memitem:a9ed659159cd59bef40264af646b828f9" id="r_a9ed659159cd59bef40264af646b828f9"><td class="memItemLeft">static constexpr uint32&#160;</td><td class="memItemRight"><a class="el" href="#a9ed659159cd59bef40264af646b828f9">TileSetupThreadsY</a> = 8</td></tr>
+<tr class="memitem:ae96cd7b47fe5fb1f235ae00763941558" id="r_ae96cd7b47fe5fb1f235ae00763941558"><td class="memItemLeft">static constexpr uint32&#160;</td><td class="memItemRight"><a class="el" href="#ae96cd7b47fe5fb1f235ae00763941558">TileSetupThreadsX</a> = 64</td></tr>
+<tr class="memitem:a9ed659159cd59bef40264af646b828f9" id="r_a9ed659159cd59bef40264af646b828f9"><td class="memItemLeft">static constexpr uint32&#160;</td><td class="memItemRight"><a class="el" href="#a9ed659159cd59bef40264af646b828f9">TileSetupThreadsY</a> = 1</td></tr>
 <tr class="memitem:abfa6088ef5125cca6d6806cb94483cf9" id="r_abfa6088ef5125cca6d6806cb94483cf9"><td class="memItemLeft">static constexpr uint32&#160;</td><td class="memItemRight"><a class="el" href="#abfa6088ef5125cca6d6806cb94483cf9">OccupancyBuildThreadsX</a> = 8</td></tr>
 <tr class="memitem:a23eabbcce7309fb69dc94aa48e6097f7" id="r_a23eabbcce7309fb69dc94aa48e6097f7"><td class="memItemLeft">static constexpr uint32&#160;</td><td class="memItemRight"><a class="el" href="#a23eabbcce7309fb69dc94aa48e6097f7">OccupancyBuildThreadsY</a> = 8</td></tr>
 <tr class="memitem:a7b3d851d4b795fab9097250091b08c1d" id="r_a7b3d851d4b795fab9097250091b08c1d"><td class="memItemLeft">static constexpr uint32&#160;</td><td class="memItemRight"><a class="el" href="#a7b3d851d4b795fab9097250091b08c1d">OccupancyBuildThreadsZ</a> = 4</td></tr>
@@ -253,7 +253,7 @@ Static Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">uint32 FIVSmokeOccupancyConfig::TileSetupThreadsX = 8</td>
+          <td class="memname">uint32 FIVSmokeOccupancyConfig::TileSetupThreadsX = 64</td>
         </tr>
       </table>
   </td>
@@ -262,7 +262,7 @@ Static Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Thread group size for tile setup (8×8 threads per tile). </p>
+<p>Thread group size for tile setup (64×1 threads for parallel Bitonic Sort). </p>
 
 <p class="definition">Definition at line <a class="el" href="_i_v_smoke_ray_march_pipeline_8h_source.html#l00044">44</a> of file <a class="el" href="_i_v_smoke_ray_march_pipeline_8h_source.html">IVSmokeRayMarchPipeline.h</a>.</p>
 
@@ -278,7 +278,7 @@ Static Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">uint32 FIVSmokeOccupancyConfig::TileSetupThreadsY = 8</td>
+          <td class="memname">uint32 FIVSmokeOccupancyConfig::TileSetupThreadsY = 1</td>
         </tr>
       </table>
   </td>
