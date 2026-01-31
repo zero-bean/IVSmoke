@@ -225,25 +225,32 @@ Controls the render pipeline integration.
 
 | Setting | Type | Default | Description |
 | --- | --- | --- | --- |
-| **Render Pass** | Enum | `After DOF (Recommended)` | When in the post-process chain to render smoke. |
 | **Smoke Visual Material** | Soft Object Path | None | Optional material for custom smoke visuals. |
-| **Visual Alpha Type** | Enum | `Use Alpha (0~1)` | How alpha blending is calculated. |
-| **Low Opacity Remap Threshold** | float | 0.02 | Remaps low opacity values to prevent HDR burn-in artifacts. |
 
-## Render Pass Options
+## Advanced Options (Show Advanced Options = true)
 
-| Option | Description | Use Case |
-| --- | --- | --- |
-| **Before DOF** | Renders before Depth of Field | Smoke participates in DOF blur. Best quality but particles render on top. |
-| **After DOF (Recommended)** | Renders after Depth of Field | Smoke remains sharp. Particles can be depth-sorted. |
-| **Translucency After DOF** | Renders with separate translucency | Required for Custom Depth sorting. See [Translucent / Custom Depth](https://www.notion.so/IVSmoke-User-Guide-2f747ec9719f80978337fc22e2ecfe8c?pvs=21). |
+| Setting | Type | Range | Default | Description |
+| --- | --- | --- | --- | --- |
+| **Enable Depth Write** | bool | - | `true` | Write smoke depth to scene depth buffer for correct translucent sorting. When enabled, particles behind opaque smoke regions are correctly occluded. |
+| **Depth Write Bias** | float | 0.0-100.0 | 50.0 | Depth bias in centimeters. Positive values push depth further from camera. Helps prevent z-fighting artifacts. |
 
-## Visual Alpha Type Options
+## Depth Write System
 
-| Option | Description |
-| --- | --- |
-| **Use Alpha (0~1)** | Standard alpha blending. Smooth transparency transitions. |
-| **Use CutOff** | Binary alpha based on threshold. Creates hard-edged smoke. |
+IVSmoke uses a **pre-pass depth write** system for correct translucent object sorting:
+
+1. **Ray March Pass** - Reads opaque scene depth (before smoke modifies it)
+2. **Upscaling & Filtering** - Prepares smoke data at full resolution
+3. **Depth Write Pass** - Writes smoke depth to scene depth buffer
+
+**Key characteristics:**
+- Only writes depth for nearly opaque pixels (Alpha >= 0.99)
+- Executes in pre-pass pipeline before engine's translucent pass
+- Particles and other translucents are automatically sorted correctly behind opaque smoke regions
+
+**When to adjust Depth Write Bias:**
+- Increase if you see z-fighting (flickering) at smoke edges
+- Decrease if particles appear to "pop through" smoke too early
+- Default value of 50 cm works well for most use cases
 
 ---
 
@@ -297,93 +304,49 @@ Controls the render pipeline integration.
 
 ---
 
-## Translucent / Custom Depth
+## Translucent Sorting
 
-When smoke needs to correctly sort with translucent objects (like fire effect, or glass), use the **Custom Depth** sorting feature.
-
-### The Problem
-
-By default, smoke renders in a single post-process pass. Translucent particles (Niagara/Cascade) may appear incorrectly in front of or behind the smoke regardless of actual depth.
-
-### The Solution: Custom Depth Sorting
-
-1. **Set Render Pass** to `Translucency After DOF`
-2. **Enable** `Use CustomDepth Sorting` checkbox (appears only when Translucency After DOF is selected)
-3. **Configure particles** to write Custom Depth
-
-### Setup Steps
-
-### Step 1: Configure IVSmoke Settings
-
-1. Go to **Project Settings > Plugins > IVSmoke > Rendering**
-2. Set **Render Pass** to `Translucency After DOF`
-3. Check **`Use CustomDepth Sorting`**
-
-### Step 2: Configure Translucent Material
-
-![GlobalSettings_image12.png](GlobalSettings_image12.png)
-
-For each material that should sort with smoke:
-
-1. Open your Material
-2. Type ‘**Custom**’ on search bar in **Details tab**
-3. Check **`Allow Custom Depth Writes`**
-
-### Step 3: Enable Custom Depth on Each Components
-
-![GlobalSettings_image13.png](GlobalSettings_image13.png)
-
-For each component that should sort with smoke:
-
-1. Select your component from **Details**
-2. Go to **Rendering > Advanced**
-3. Check `Render CustomDepth Pass`
-
-### Step 4: Enable Project Custom Depth
-
-![GlobalSettings_image14.png](GlobalSettings_image14.png)
-
-1. Go to **Project Settings > Engine > Rendering**
-2. Set **Custom Depth-Stencil Pass** to `Enabled with Stencil`
-
-### Step 5: Set Opacity Mask Clip Value (Optional)
-
-For proper depth testing across all opacity ranges, you must set a low **Opacity Mask Clip Value** on your particle materials:
-
-1. Open your particle material
-2. Set **Opacity Mask Clip Value** to a low value (e.g., `0.01`)
-3. This ensures that particles with any visible opacity correctly write to Custom Depth
+When smoke needs to correctly sort with translucent objects (like fire effects or glass), IVSmoke uses a **Depth Write** system.
 
 ### How It Works
 
+IVSmoke writes smoke depth to the standard scene depth buffer during a pre-pass, before Unreal's translucent pass executes. This allows translucent particles (Niagara/Cascade) and other translucent objects to correctly depth-test against smoke.
+
 ```
-Without Custom Depth:
+Render Pipeline Order:
 ┌─────────────────────────────┐
-│ Scene Color                 │
+│ 1. Opaque Pass              │  ← Scene geometry renders
 ├─────────────────────────────┤
-│ Smoke (always on top)       │  ← Problem: Ignores depth
+│ 2. IVSmoke Pre-Pass         │  ← Ray march + Depth Write
+│    - Reads opaque depth     │
+│    - Writes smoke depth     │
 ├─────────────────────────────┤
-│ Particles                   │
-└─────────────────────────────┘
-
-With Custom Depth Sorting:
-┌─────────────────────────────┐
-│ Scene Color                 │
+│ 3. Translucent Pass         │  ← Particles read scene depth (includes smoke)
+│    - Correct sorting!       │
 ├─────────────────────────────┤
-│ Per-pixel depth comparison  │  ← Reads Custom Depth + Scene Depth
-│ Smoke OR Particle           │  ← Composites based on depth
+│ 4. IVSmoke Post-Pass        │  ← Final composite
 └─────────────────────────────┘
 ```
 
-### Performance Considerations
+### Automatic Sorting
 
-| Feature | Cost |
+Unlike previous versions that required Custom Depth configuration, the current Depth Write system works automatically:
+
+- **No additional setup required** for translucent sorting
+- Particles behind opaque smoke regions are correctly occluded
+- Only nearly opaque smoke pixels (Alpha >= 0.99) write depth
+
+### Troubleshooting
+
+| Issue | Solution |
 | --- | --- |
-| Custom Depth Pass | Low (if already enabled) |
-| Depth-Sorted Compositing | Medium (additional texture reads per pixel) |
-| Particle Custom Depth Output | Low per particle |
+| Particles appear in front of smoke | Ensure **Enable Depth Write** is `true` (default) |
+| Z-fighting at smoke edges | Increase **Depth Write Bias** value |
+| Particles pop through too early | Decrease **Depth Write Bias** value |
 
-**Recommendation:** Only enable Custom Depth sorting when you have translucent particles that must correctly intersect with smoke volumes.
+### Performance
+
+The Depth Write system has minimal performance overhead as it runs as part of the pre-pass pipeline and only writes depth for opaque smoke regions.
 
 ---
 
